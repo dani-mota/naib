@@ -2,12 +2,14 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, ChevronUp, ChevronDown, AlertTriangle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, ChevronUp, ChevronDown, AlertTriangle, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ScoreBar } from "@/components/ui/score-bar";
 import { InitialsBadge } from "@/components/ui/initials-badge";
 import { formatRelativeDate } from "@/lib/format";
+import { downloadCSV } from "@/lib/export";
 
 interface CandidateRow {
   id: string;
@@ -30,12 +32,24 @@ interface CandidateTableProps {
 
 type SortField = "name" | "status" | "role" | "score" | "date";
 
+const STATUS_LABELS: Record<string, string> = {
+  RECOMMENDED: "Strong Fit",
+  REVIEW_REQUIRED: "Conditional Fit",
+  DO_NOT_ADVANCE: "Not a Direct Fit",
+  INCOMPLETE: "In Progress",
+  SCORING: "Scoring",
+};
+
 export function CandidateTable({ candidates }: CandidateTableProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [batchStatus, setBatchStatus] = useState("");
+  const [batchLoading, setBatchLoading] = useState(false);
 
   const roles = useMemo(() => {
     const r = new Set(candidates.map((c) => c.primaryRole.slug));
@@ -116,6 +130,54 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
     );
   };
 
+  const toggleSelect = (id: string) => {
+    const next = new Set(selectedIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedIds(next);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((c) => c.id)));
+    }
+  };
+
+  const handleExportCSV = (rows: CandidateRow[]) => {
+    const headers = ["Name", "Email", "Role", "Composite", "Status", "Flags", "Date"];
+    const csvRows = rows.map((c) => [
+      `${c.firstName} ${c.lastName}`,
+      c.email,
+      c.primaryRole.name,
+      String(getComposite(c)),
+      STATUS_LABELS[c.status] ?? c.status,
+      String(c.assessment?.redFlags.length ?? 0),
+      new Date(c.createdAt).toLocaleDateString(),
+    ]);
+    downloadCSV("naib-candidates.csv", headers, csvRows);
+  };
+
+  const handleBatchStatus = async () => {
+    if (!batchStatus || selectedIds.size === 0) return;
+    setBatchLoading(true);
+    try {
+      const res = await fetch("/api/candidates/batch-status", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidateIds: Array.from(selectedIds), status: batchStatus }),
+      });
+      if (res.ok) {
+        setSelectedIds(new Set());
+        setBatchStatus("");
+        router.refresh();
+      }
+    } finally {
+      setBatchLoading(false);
+    }
+  };
+
   return (
     <div className="bg-card border border-border">
       {/* Toolbar */}
@@ -150,6 +212,13 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
               <option key={r.slug} value={r.slug}>{r.name}</option>
             ))}
           </select>
+          <button
+            onClick={() => handleExportCSV(filtered)}
+            className="flex items-center gap-1 h-8 px-2.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border hover:bg-accent transition-colors"
+          >
+            <Download className="w-3 h-3" />
+            CSV
+          </button>
         </div>
       </div>
 
@@ -158,6 +227,14 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">
+              <th className="py-2.5 px-3 w-8">
+                <input
+                  type="checkbox"
+                  checked={filtered.length > 0 && selectedIds.size === filtered.length}
+                  onChange={toggleSelectAll}
+                  className="border-border w-3 h-3"
+                />
+              </th>
               <th className="text-left py-2.5 px-4 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
                 <button onClick={() => handleSort("name")} className="flex items-center gap-1 hover:text-foreground">
                   Candidate <SortIcon field="name" />
@@ -193,12 +270,21 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
               const composite = getComposite(candidate);
               const flagCount = candidate.assessment?.redFlags.length ?? 0;
               const hasCritical = candidate.assessment?.redFlags.some(f => f.severity === "CRITICAL");
+              const isSelected = selectedIds.has(candidate.id);
 
               return (
                 <tr
                   key={candidate.id}
-                  className="border-b border-border/50 hover:bg-accent/50 transition-colors"
+                  className={`border-b border-border/50 hover:bg-accent/50 transition-colors ${isSelected ? "bg-naib-gold/5" : ""}`}
                 >
+                  <td className="py-2.5 px-3">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelect(candidate.id)}
+                      className="border-border w-3 h-3"
+                    />
+                  </td>
                   <td className="py-2.5 px-4">
                     <Link href={`/candidates/${candidate.id}`} className="flex items-center gap-3 group">
                       <InitialsBadge firstName={candidate.firstName} lastName={candidate.lastName} size="sm" />
@@ -245,9 +331,50 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
         )}
       </div>
 
-      {/* Footer */}
+      {/* Footer / Bulk Actions */}
       <div className="p-3 border-t border-border flex items-center justify-between text-[10px] text-muted-foreground font-mono uppercase tracking-wider">
         <span>Showing {filtered.length} of {candidates.length} candidates</span>
+
+        {selectedIds.size > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-foreground font-semibold">{selectedIds.size} selected</span>
+            <button
+              onClick={() => {
+                const selectedCandidates = candidates.filter((c) => selectedIds.has(c.id));
+                handleExportCSV(selectedCandidates);
+              }}
+              className="flex items-center gap-1 px-2.5 py-1 text-muted-foreground border border-border hover:bg-accent transition-colors"
+            >
+              <Download className="w-3 h-3" />
+              Export
+            </button>
+            <select
+              value={batchStatus}
+              onChange={(e) => setBatchStatus(e.target.value)}
+              className="h-6 border border-border px-2 text-[10px] bg-card text-foreground"
+            >
+              <option value="">Change Status...</option>
+              <option value="RECOMMENDED">Strong Fit</option>
+              <option value="REVIEW_REQUIRED">Conditional Fit</option>
+              <option value="DO_NOT_ADVANCE">Not a Direct Fit</option>
+            </select>
+            {batchStatus && (
+              <button
+                onClick={handleBatchStatus}
+                disabled={batchLoading}
+                className="px-2.5 py-1 bg-naib-gold text-naib-navy font-semibold hover:bg-naib-gold/90 transition-colors disabled:opacity-50"
+              >
+                {batchLoading ? "..." : "Apply"}
+              </button>
+            )}
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="px-2 py-1 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Clear
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ResponsiveContainer, Tooltip, Legend,
 } from "recharts";
+import { Download } from "lucide-react";
 import { CONSTRUCTS, LAYER_INFO, type LayerType } from "@/lib/constructs";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ScoreBar } from "@/components/ui/score-bar";
+import { captureElementAsPNG, downloadCSV } from "@/lib/export";
 
 const CANDIDATE_COLORS = ["#2563EB", "#059669", "#D97706"];
 
@@ -17,11 +19,33 @@ interface CompareClientProps {
 }
 
 export function CompareClient({ candidates, roles }: CompareClientProps) {
+  const compareRef = useRef<HTMLDivElement>(null);
   const [selectedRoleSlug, setSelectedRoleSlug] = useState(
     candidates[0]?.primaryRole?.slug || roles[0]?.slug
   );
 
   const constructKeys = Object.keys(CONSTRUCTS);
+
+  const handleExportPNG = async () => {
+    if (compareRef.current) {
+      await captureElementAsPNG(compareRef.current, "naib-comparison.png");
+    }
+  };
+
+  const handleExportCSV = () => {
+    const headers = ["Construct", ...candidates.map((c: any) => `${c.firstName} ${c.lastName}`)];
+    const csvRows = constructKeys.map((key) => {
+      const meta = CONSTRUCTS[key as keyof typeof CONSTRUCTS];
+      return [
+        meta.name,
+        ...candidates.map((c: any) => {
+          const r = c.assessment?.subtestResults?.find((r: any) => r.construct === key);
+          return String(r?.percentile ?? 0);
+        }),
+      ];
+    });
+    downloadCSV("naib-comparison.csv", headers, csvRows);
+  };
 
   const chartData = constructKeys.map((key) => {
     const meta = CONSTRUCTS[key as keyof typeof CONSTRUCTS];
@@ -37,7 +61,7 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
   });
 
   return (
-    <div className="p-6 space-y-6">
+    <div ref={compareRef} className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
@@ -47,15 +71,31 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
             Comparing {candidates.length} candidates side-by-side
           </p>
         </div>
-        <select
-          value={selectedRoleSlug}
-          onChange={(e) => setSelectedRoleSlug(e.target.value)}
-          className="h-8 border border-border px-3 text-xs bg-card text-foreground font-mono"
-        >
-          {roles.map((r: any) => (
-            <option key={r.slug} value={r.slug}>{r.name}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border hover:bg-accent transition-colors"
+          >
+            <Download className="w-3 h-3" />
+            CSV
+          </button>
+          <button
+            onClick={handleExportPNG}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border hover:bg-accent transition-colors"
+          >
+            <Download className="w-3 h-3" />
+            PNG
+          </button>
+          <select
+            value={selectedRoleSlug}
+            onChange={(e) => setSelectedRoleSlug(e.target.value)}
+            className="h-8 border border-border px-3 text-xs bg-card text-foreground font-mono"
+          >
+            {roles.map((r: any) => (
+              <option key={r.slug} value={r.slug}>{r.name}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Candidate cards */}

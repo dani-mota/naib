@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronUp, ChevronDown, Download, Image } from "lucide-react";
 import { CONSTRUCTS, LAYER_INFO, type LayerType } from "@/lib/constructs";
-import { getScoreTier, formatPercentile } from "@/lib/format";
+import { getScoreTier } from "@/lib/format";
+import { downloadCSV, captureElementAsPNG } from "@/lib/export";
 
 interface HeatmapClientProps {
   candidates: any[];
@@ -16,10 +17,16 @@ interface HeatmapClientProps {
 
 const CONSTRUCT_ORDER = Object.keys(CONSTRUCTS);
 
+type SortKey = "composite" | string; // "composite" or a construct key
+
 export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapClientProps) {
   const router = useRouter();
+  const tableRef = useRef<HTMLDivElement>(null);
   const [selectedRoleSlug, setSelectedRoleSlug] = useState(roles[0]?.slug || "");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [sortKey, setSortKey] = useState<SortKey>("composite");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [hoveredCell, setHoveredCell] = useState<{ key: string; val: number; x: number; y: number } | null>(null);
 
   const selectedRole = roles.find((r: any) => r.slug === selectedRoleSlug);
   const roleCutline = cutlines.find((c: any) => c.roleId === selectedRole?.id);
@@ -30,8 +37,14 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
     return new Set(sorted.slice(0, 3).map((w: any) => w.constructId));
   }, [roleWeights]);
 
+  const weightMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const w of roleWeights) map[w.constructId] = w.weight;
+    return map;
+  }, [roleWeights]);
+
   const rows = useMemo(() => {
-    return candidates
+    const base = candidates
       .filter((c: any) => c.assessment?.subtestResults?.length > 0)
       .map((c: any) => {
         const composite = c.assessment?.compositeScores?.find(
@@ -50,9 +63,38 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
           passed: composite?.passed ?? false,
           scores,
         };
-      })
-      .sort((a, b) => b.composite - a.composite);
-  }, [candidates, selectedRoleSlug]);
+      });
+
+    // Sort
+    base.sort((a, b) => {
+      let aVal: number, bVal: number;
+      if (sortKey === "composite") {
+        aVal = a.composite;
+        bVal = b.composite;
+      } else {
+        aVal = a.scores[sortKey] ?? 0;
+        bVal = b.scores[sortKey] ?? 0;
+      }
+      return sortDir === "desc" ? bVal - aVal : aVal - bVal;
+    });
+
+    return base;
+  }, [candidates, selectedRoleSlug, sortKey, sortDir]);
+
+  const handleRoleChange = (slug: string) => {
+    setSelectedRoleSlug(slug);
+    setSortKey("composite");
+    setSortDir("desc");
+  };
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === "desc" ? "asc" : "desc");
+    } else {
+      setSortKey(key);
+      setSortDir("desc");
+    }
+  };
 
   const toggleSelect = (id: string) => {
     const next = new Set(selectedIds);
@@ -64,6 +106,22 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
   const handleCompare = () => {
     if (selectedIds.size >= 2) {
       router.push(`/compare?ids=${Array.from(selectedIds).join(",")}`);
+    }
+  };
+
+  const handleExportCSV = () => {
+    const headers = ["Candidate", "Composite", ...CONSTRUCT_ORDER.map((k) => CONSTRUCTS[k as keyof typeof CONSTRUCTS].abbreviation)];
+    const csvRows = rows.map((row) => [
+      row.name,
+      String(row.composite),
+      ...CONSTRUCT_ORDER.map((k) => String(row.scores[k] ?? 0)),
+    ]);
+    downloadCSV(`naib-heatmap-${selectedRoleSlug}.csv`, headers, csvRows);
+  };
+
+  const handleExportPNG = async () => {
+    if (tableRef.current) {
+      await captureElementAsPNG(tableRef.current, `naib-heatmap-${selectedRoleSlug}.png`);
     }
   };
 
@@ -79,6 +137,13 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
     if (percentile >= 25) return "rgba(245, 158, 11, 0.12)";
     return "rgba(220, 38, 38, 0.12)";
   };
+
+  const SortIndicator = useCallback(({ active, dir }: { active: boolean; dir: "asc" | "desc" }) => {
+    if (!active) return null;
+    return dir === "desc"
+      ? <ChevronDown className="w-2.5 h-2.5 inline-block ml-0.5" />
+      : <ChevronUp className="w-2.5 h-2.5 inline-block ml-0.5" />;
+  }, []);
 
   const cutlineIndex = rows.findIndex((r) => !r.passed);
 
@@ -103,9 +168,23 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
               Compare ({selectedIds.size})
             </button>
           )}
+          <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border hover:bg-accent transition-colors"
+          >
+            <Download className="w-3 h-3" />
+            CSV
+          </button>
+          <button
+            onClick={handleExportPNG}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border hover:bg-accent transition-colors"
+          >
+            <Image className="w-3 h-3" />
+            PNG
+          </button>
           <select
             value={selectedRoleSlug}
-            onChange={(e) => setSelectedRoleSlug(e.target.value)}
+            onChange={(e) => handleRoleChange(e.target.value)}
             className="h-7 border border-border px-2 text-[10px] bg-card text-foreground font-mono"
           >
             {roles.map((r: any) => (
@@ -123,7 +202,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
       </div>
 
       {/* Heatmap */}
-      <div className="bg-card border border-border overflow-x-auto">
+      <div ref={tableRef} className="bg-card border border-border overflow-x-auto relative">
         <table className="w-full text-[9px]">
           <thead>
             <tr className="border-b border-border">
@@ -131,8 +210,12 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
               <th className="sticky left-7 bg-card z-10 py-1.5 px-1.5 text-left font-medium text-muted-foreground uppercase tracking-wider min-w-[120px]">
                 Candidate
               </th>
-              <th className="py-1.5 px-1 text-center font-semibold text-foreground min-w-[38px] uppercase tracking-wider">
+              <th
+                className="py-1.5 px-1 text-center font-semibold text-foreground min-w-[38px] uppercase tracking-wider cursor-pointer hover:bg-accent/30 select-none"
+                onClick={() => handleSort("composite")}
+              >
                 CI
+                <SortIndicator active={sortKey === "composite"} dir={sortDir} />
               </th>
               {CONSTRUCT_ORDER.map((key) => {
                 const meta = CONSTRUCTS[key as keyof typeof CONSTRUCTS];
@@ -142,11 +225,12 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                 return (
                   <th
                     key={key}
-                    className={`py-1.5 px-1 text-center font-medium min-w-[36px] ${isHighWeight ? "border-l-2 border-l-naib-gold" : ""}`}
+                    className={`py-1.5 px-1 text-center font-medium min-w-[36px] cursor-pointer hover:bg-accent/30 select-none ${isHighWeight ? "border-l-2 border-l-naib-gold" : ""}`}
                     style={{ borderTop: `2px solid ${layerInfo.color}` }}
-                    title={meta.name}
+                    onClick={() => handleSort(key)}
                   >
                     <span className="font-mono" style={{ color: layerInfo.color }}>{meta.abbreviation}</span>
+                    <SortIndicator active={sortKey === key} dir={sortDir} />
                   </th>
                 );
               })}
@@ -194,7 +278,10 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                     <td
                       key={key}
                       className={`py-0.5 px-1 text-center ${isHighWeight ? "border-l-2 border-l-naib-gold/30" : ""}`}
-                      title={`${CONSTRUCTS[key as keyof typeof CONSTRUCTS].name}: ${formatPercentile(val)}`}
+                      onMouseEnter={(e) => {
+                        setHoveredCell({ key, val, x: e.clientX, y: e.clientY });
+                      }}
+                      onMouseLeave={() => setHoveredCell(null)}
                     >
                       <span
                         className="inline-flex items-center justify-center w-8 h-5 text-[9px] font-medium font-mono"
@@ -212,6 +299,40 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
             ))}
           </tbody>
         </table>
+
+        {/* Custom tooltip */}
+        {hoveredCell && (() => {
+          const meta = CONSTRUCTS[hoveredCell.key as keyof typeof CONSTRUCTS];
+          const layerInfo = LAYER_INFO[meta.layer as LayerType];
+          const tier = getScoreTier(hoveredCell.val);
+          const weight = weightMap[hoveredCell.key];
+          return (
+            <div
+              className="fixed z-50 bg-card/95 backdrop-blur-sm p-3 shadow-xl border border-border max-w-[220px]"
+              style={{
+                left: hoveredCell.x + 12,
+                top: hoveredCell.y - 8,
+                pointerEvents: "none",
+              }}
+            >
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-2 h-2" style={{ backgroundColor: layerInfo.color }} />
+                <span className="text-[10px] font-semibold text-foreground uppercase tracking-wider">{meta.name}</span>
+              </div>
+              <p className="text-sm font-bold font-mono mb-1" style={{ color: tier.color }}>
+                {hoveredCell.val}<span className="text-[9px] font-normal text-muted-foreground ml-0.5">th — {tier.label}</span>
+              </p>
+              <p className="text-[9px] text-muted-foreground font-mono">
+                Layer: {layerInfo.name}
+              </p>
+              {weight !== undefined && (
+                <p className="text-[9px] text-muted-foreground font-mono">
+                  Role weight: {Math.round(weight * 100)}%
+                </p>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Legend */}

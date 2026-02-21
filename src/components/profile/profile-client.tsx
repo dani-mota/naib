@@ -7,10 +7,11 @@ import { SpiderChart } from "./spider-chart";
 import { IntelligenceReport } from "./intelligence-report";
 import { LayerResults } from "./layer-results";
 import { PredictionsGrid } from "./predictions-grid";
+import { NotesPanel } from "./notes-panel";
 import { RoleSwitcher } from "./role-switcher";
 import { InterviewGuide } from "./interview-guide";
 import { CONSTRUCTS, LAYER_INFO, type LayerType } from "@/lib/constructs";
-import { AlertTriangle, TrendingUp, TrendingDown, Shield } from "lucide-react";
+import { AlertTriangle, TrendingUp, TrendingDown, Shield, FileDown } from "lucide-react";
 
 interface ProfileClientProps {
   candidate: any;
@@ -131,6 +132,22 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
             compositeScore={compositeScore}
             roleName={selectedRole?.name}
           />
+          {/* Quick Actions */}
+          <div className="bg-card border border-border p-4">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-2">Actions</p>
+            <button
+              onClick={() => {
+                const a = document.createElement("a");
+                a.href = `/api/export/pdf/${candidate.id}`;
+                a.download = `${candidate.firstName}_${candidate.lastName}_Scorecard.pdf`;
+                a.click();
+              }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-naib-gold border border-naib-gold/30 hover:bg-naib-gold/10 transition-colors"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              Export PDF Scorecard
+            </button>
+          </div>
         </div>
 
         {/* Center Column */}
@@ -250,6 +267,8 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
           />
 
           <PredictionsGrid prediction={predictions} />
+
+          <NotesPanel notes={candidate.notes || []} candidateId={candidate.id} />
         </div>
 
         {/* Right Sidebar */}
