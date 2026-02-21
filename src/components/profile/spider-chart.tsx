@@ -99,27 +99,43 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  // Custom grid: concentric circles (neutral) + radial lines colored by layer
-  const CustomPolarGrid = useCallback((props: any) => {
+  // Colored radial lines + subtle layer wedge fills, rendered behind the grid
+  const LayerOverlay = useCallback((props: any) => {
     const { cx, cy, outerRadius } = props;
     if (!cx || !cy || !outerRadius) return null;
 
     const count = data.length;
-    const concentricRadii = [0.2, 0.4, 0.6, 0.8, 1.0];
+
+    // Build wedge paths for each layer section
+    const wedges: { path: string; color: string }[] = [];
+    for (let i = 0; i < count; i++) {
+      const d = data[i];
+      const nextD = data[(i + 1) % count];
+
+      // Only draw wedge fill between adjacent constructs of the same layer
+      if (d.layer === nextD.layer) {
+        const angle1 = (Math.PI * 2 * i) / count - Math.PI / 2;
+        const angle2 = (Math.PI * 2 * (i + 1)) / count - Math.PI / 2;
+        const x1 = cx + outerRadius * Math.cos(angle1);
+        const y1 = cy + outerRadius * Math.sin(angle1);
+        const x2 = cx + outerRadius * Math.cos(angle2);
+        const y2 = cy + outerRadius * Math.sin(angle2);
+        const largeArc = 0;
+
+        wedges.push({
+          path: `M ${cx} ${cy} L ${x1} ${y1} A ${outerRadius} ${outerRadius} 0 ${largeArc} 1 ${x2} ${y2} Z`,
+          color: d.layerColor,
+        });
+      }
+    }
 
     return (
       <g>
-        {concentricRadii.map((ratio) => (
-          <circle
-            key={ratio}
-            cx={cx}
-            cy={cy}
-            r={outerRadius * ratio}
-            fill="none"
-            stroke="var(--border)"
-            strokeWidth={1}
-          />
+        {/* Subtle layer wedge fills */}
+        {wedges.map((w, i) => (
+          <path key={`wedge-${i}`} d={w.path} fill={w.color} fillOpacity={0.04} />
         ))}
+        {/* Colored radial lines from center to each axis */}
         {data.map((d, i) => {
           const angle = (Math.PI * 2 * i) / count - Math.PI / 2;
           const x2 = cx + outerRadius * Math.cos(angle);
@@ -133,7 +149,7 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
               y2={y2}
               stroke={d.layerColor}
               strokeWidth={1}
-              strokeOpacity={0.3}
+              strokeOpacity={0.35}
             />
           );
         })}
@@ -174,8 +190,10 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
         <div className="h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="72%" data={data}>
-              <PolarGrid gridType="circle" stroke="var(--border)" radialLines={false} />
-              <CustomPolarGrid cx={0} cy={0} outerRadius={0} />
+              {/* Default polygon grid (concentric rings), no radial lines — we draw our own */}
+              <PolarGrid stroke="var(--border)" radialLines={false} />
+              {/* Layer-colored radial lines + subtle wedge fills */}
+              <LayerOverlay cx={0} cy={0} outerRadius={0} />
               <PolarAngleAxis
                 dataKey="construct"
                 tick={<CustomTick />}
@@ -186,7 +204,7 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
                 tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
                 tickCount={5}
               />
-              {/* Role benchmark — dashed, no dots */}
+              {/* Role benchmark — dashed, absolutely no dots */}
               <Radar
                 name="Benchmark"
                 dataKey="benchmark"
@@ -195,6 +213,7 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
                 fill="none"
                 strokeWidth={1}
                 dot={false}
+                activeDot={false}
                 isAnimationActive={false}
               />
               {/* Candidate score — filled polygon with layer-colored dots */}
@@ -207,8 +226,8 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
                 fillOpacity={0.06}
                 strokeWidth={1.5}
                 dot={<CustomDot />}
+                activeDot={false}
               />
-              {/* No <Tooltip> — popup only on axis label hover */}
             </RadarChart>
           </ResponsiveContainer>
         </div>
