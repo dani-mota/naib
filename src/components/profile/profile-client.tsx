@@ -27,9 +27,9 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
 
   return (
     <div className="p-6">
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_300px] gap-4">
         {/* Left Sidebar */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <IdentityCard candidate={candidate} />
           <DecisionSummary
             candidate={candidate}
@@ -39,54 +39,50 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
         </div>
 
         {/* Center Column */}
-        <div className="space-y-6 min-w-0">
+        <div className="space-y-4 min-w-0">
           {/* Executive Summary */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-naib-navy mb-3" style={{ fontFamily: "var(--font-dm-sans)" }}>
+          <div className="bg-card border border-border p-5">
+            <h2 className="text-sm font-semibold text-foreground mb-2 uppercase tracking-wider" style={{ fontFamily: "var(--font-dm-sans)" }}>
               Executive Summary
             </h2>
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               {candidate.firstName} {candidate.lastName} was assessed for the{" "}
-              <strong>{selectedRole?.name}</strong> role and received a composite score of{" "}
-              <strong>{compositeScore?.percentile ?? "N/A"}th percentile</strong>.{" "}
+              <strong className="text-foreground">{selectedRole?.name}</strong> role and received a composite score of{" "}
+              <strong className="text-foreground font-mono">{compositeScore?.percentile ?? "N/A"}th percentile</strong>.{" "}
               {compositeScore?.passed
                 ? "The candidate meets all cutline thresholds and is recommended for advancement."
                 : `The candidate is ${Math.abs(compositeScore?.distanceFromCutline ?? 0)} points from the nearest cutline threshold.`}
             </p>
             {candidate.assessment?.redFlags?.length > 0 && (
-              <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-100">
-                <p className="text-sm text-red-800 font-medium">
+              <div className="mt-3 p-3 bg-naib-red/5 border border-naib-red/20">
+                <p className="text-xs text-naib-red font-medium font-mono uppercase tracking-wider">
                   {candidate.assessment.redFlags.length} flag(s) identified during assessment
                 </p>
               </div>
             )}
           </div>
 
-          {/* Spider Chart */}
           <SpiderChart
             subtestResults={candidate.assessment?.subtestResults || []}
             roleWeights={selectedRole?.compositeWeights || []}
             cutline={cutline}
           />
 
-          {/* Intelligence Report */}
           <IntelligenceReport
             subtestResults={candidate.assessment?.subtestResults || []}
             roleName={selectedRole?.name}
           />
 
-          {/* Layer Results */}
           <LayerResults
             subtestResults={candidate.assessment?.subtestResults || []}
             aiInteractions={candidate.assessment?.aiInteractions || []}
           />
 
-          {/* Predictions */}
           <PredictionsGrid prediction={candidate.assessment?.predictions} />
         </div>
 
         {/* Right Sidebar */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <RoleSwitcher
             roles={allRoles}
             selectedSlug={selectedRoleSlug}

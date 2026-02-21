@@ -40,17 +40,17 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-naib-navy" style={{ fontFamily: "var(--font-dm-sans)" }}>
+          <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
             Candidate Comparison
           </h1>
-          <p className="text-sm text-naib-slate mt-1">
+          <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">
             Comparing {candidates.length} candidates side-by-side
           </p>
         </div>
         <select
           value={selectedRoleSlug}
           onChange={(e) => setSelectedRoleSlug(e.target.value)}
-          className="h-9 rounded-lg border border-gray-200 px-3 text-sm bg-white"
+          className="h-8 border border-border px-3 text-xs bg-card text-foreground font-mono"
         >
           {roles.map((r: any) => (
             <option key={r.slug} value={r.slug}>{r.name}</option>
@@ -59,48 +59,48 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
       </div>
 
       {/* Candidate cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {candidates.map((c: any, i: number) => {
           const composite = c.assessment?.compositeScores?.find(
             (cs: any) => cs.roleSlug === selectedRoleSlug
           );
           return (
-            <div key={c.id} className="bg-white rounded-xl border-2 p-4" style={{ borderColor: CANDIDATE_COLORS[i] }}>
+            <div key={c.id} className="bg-card border-2 p-4" style={{ borderColor: CANDIDATE_COLORS[i] }}>
               <div className="flex items-center gap-3 mb-3">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold"
+                  className="w-9 h-9 flex items-center justify-center text-white font-semibold text-xs"
                   style={{ backgroundColor: CANDIDATE_COLORS[i] }}
                 >
                   {c.firstName[0]}{c.lastName[0]}
                 </div>
                 <div>
-                  <p className="font-semibold text-naib-navy">{c.firstName} {c.lastName}</p>
-                  <p className="text-xs text-naib-slate">{c.primaryRole.name}</p>
+                  <p className="text-xs font-semibold text-foreground">{c.firstName} {c.lastName}</p>
+                  <p className="text-[10px] text-muted-foreground font-mono uppercase">{c.primaryRole.name}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between mb-2">
                 <StatusBadge status={c.status} size="sm" />
-                <span className="text-lg font-bold" style={{ color: CANDIDATE_COLORS[i] }}>
+                <span className="text-lg font-bold font-mono" style={{ color: CANDIDATE_COLORS[i] }}>
                   {composite?.percentile ?? "—"}
                 </span>
               </div>
-              <ScoreBar percentile={composite?.percentile ?? 0} height={4} />
+              <ScoreBar percentile={composite?.percentile ?? 0} height={3} />
             </div>
           );
         })}
       </div>
 
       {/* Overlaid Spider Chart */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-naib-navy mb-4" style={{ fontFamily: "var(--font-dm-sans)" }}>
+      <div className="bg-card border border-border p-5">
+        <h2 className="text-xs font-semibold text-foreground mb-4 uppercase tracking-wider" style={{ fontFamily: "var(--font-dm-sans)" }}>
           Construct Overlay
         </h2>
-        <div className="h-[450px]">
+        <div className="h-[420px]">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
-              <PolarGrid stroke="#e2e8f0" />
-              <PolarAngleAxis dataKey="construct" tick={{ fill: "#64748b", fontSize: 11 }} />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#94a3b8", fontSize: 10 }} tickCount={5} />
+              <PolarGrid stroke="var(--border)" />
+              <PolarAngleAxis dataKey="construct" tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} />
+              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "var(--muted-foreground)", fontSize: 9 }} tickCount={5} />
               {candidates.map((c: any, i: number) => (
                 <Radar
                   key={c.id}
@@ -120,13 +120,13 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
       </div>
 
       {/* Construct-by-construct table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-card border border-border overflow-hidden">
+        <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="py-3 px-4 text-left font-medium text-naib-slate">Construct</th>
+            <tr className="border-b border-border bg-accent/30">
+              <th className="py-2.5 px-4 text-left font-medium text-muted-foreground uppercase tracking-wider text-[10px]">Construct</th>
               {candidates.map((c: any, i: number) => (
-                <th key={c.id} className="py-3 px-4 text-center font-medium" style={{ color: CANDIDATE_COLORS[i] }}>
+                <th key={c.id} className="py-2.5 px-4 text-center font-medium text-[10px] uppercase tracking-wider" style={{ color: CANDIDATE_COLORS[i] }}>
                   {c.firstName} {c.lastName[0]}.
                 </th>
               ))}
@@ -143,18 +143,18 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
               const maxScore = Math.max(...scores);
 
               return (
-                <tr key={key} className="border-b border-gray-50">
-                  <td className="py-3 px-4">
+                <tr key={key} className="border-b border-border/50">
+                  <td className="py-2.5 px-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: layerInfo.color }} />
-                      <span className="font-medium text-naib-navy">{meta.name}</span>
-                      <span className="text-xs text-naib-slate">({meta.abbreviation})</span>
+                      <div className="w-2 h-2" style={{ backgroundColor: layerInfo.color }} />
+                      <span className="font-medium text-foreground">{meta.name}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono">({meta.abbreviation})</span>
                     </div>
                   </td>
                   {scores.map((score, i) => (
-                    <td key={i} className="py-3 px-4 text-center">
+                    <td key={i} className="py-2.5 px-4 text-center">
                       <span
-                        className={`inline-flex items-center justify-center w-12 h-8 rounded text-sm font-semibold ${
+                        className={`inline-flex items-center justify-center w-10 h-7 text-xs font-semibold font-mono ${
                           score === maxScore && candidates.length > 1 ? "ring-2 ring-naib-gold bg-naib-gold/10" : ""
                         }`}
                         style={{ color: CANDIDATE_COLORS[i] }}
@@ -166,27 +166,27 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
                 </tr>
               );
             })}
-            {/* Predictions row */}
-            <tr className="bg-gray-50 border-t-2 border-gray-200">
-              <td className="py-3 px-4 font-medium text-naib-navy">Ramp Time</td>
+            {/* Predictions rows */}
+            <tr className="bg-accent/30 border-t-2 border-border">
+              <td className="py-2.5 px-4 font-medium text-foreground uppercase tracking-wider text-[10px]">Ramp Time</td>
               {candidates.map((c: any, i: number) => (
-                <td key={c.id} className="py-3 px-4 text-center text-sm" style={{ color: CANDIDATE_COLORS[i] }}>
+                <td key={c.id} className="py-2.5 px-4 text-center font-mono" style={{ color: CANDIDATE_COLORS[i] }}>
                   {c.assessment?.predictions?.rampTimeLabel ?? "—"}
                 </td>
               ))}
             </tr>
-            <tr className="bg-gray-50">
-              <td className="py-3 px-4 font-medium text-naib-navy">Supervision</td>
+            <tr className="bg-accent/30">
+              <td className="py-2.5 px-4 font-medium text-foreground uppercase tracking-wider text-[10px]">Supervision</td>
               {candidates.map((c: any, i: number) => (
-                <td key={c.id} className="py-3 px-4 text-center text-sm" style={{ color: CANDIDATE_COLORS[i] }}>
+                <td key={c.id} className="py-2.5 px-4 text-center font-mono" style={{ color: CANDIDATE_COLORS[i] }}>
                   {c.assessment?.predictions?.supervisionLoad ?? "—"}
                 </td>
               ))}
             </tr>
-            <tr className="bg-gray-50">
-              <td className="py-3 px-4 font-medium text-naib-navy">Ceiling</td>
+            <tr className="bg-accent/30">
+              <td className="py-2.5 px-4 font-medium text-foreground uppercase tracking-wider text-[10px]">Ceiling</td>
               {candidates.map((c: any, i: number) => (
-                <td key={c.id} className="py-3 px-4 text-center text-sm" style={{ color: CANDIDATE_COLORS[i] }}>
+                <td key={c.id} className="py-2.5 px-4 text-center font-mono" style={{ color: CANDIDATE_COLORS[i] }}>
                   {c.assessment?.predictions?.performanceCeiling ?? "—"}
                 </td>
               ))}

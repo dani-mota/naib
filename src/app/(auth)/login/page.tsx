@@ -16,7 +16,6 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Mock login — just redirect to dashboard
     setTimeout(() => {
       router.push("/dashboard");
     }, 500);
@@ -37,7 +36,7 @@ export default function LoginPage() {
     >
       <form onSubmit={handleLogin} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-naib-navy mb-1">
+          <label htmlFor="email" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">
             Email
           </label>
           <Input
@@ -49,7 +48,7 @@ export default function LoginPage() {
           />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-naib-navy mb-1">
+          <label htmlFor="password" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">
             Password
           </label>
           <Input
@@ -61,22 +60,22 @@ export default function LoginPage() {
           />
         </div>
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-naib-slate">
-            <input type="checkbox" className="rounded border-gray-300" />
+          <label className="flex items-center gap-2 text-xs text-muted-foreground">
+            <input type="checkbox" className="border-border" />
             Remember me
           </label>
-          <Link href="/forgot-password" className="text-sm text-naib-blue hover:text-naib-blue/80">
+          <Link href="/forgot-password" className="text-xs text-naib-blue hover:text-naib-blue/80">
             Forgot password?
           </Link>
         </div>
-        <Button type="submit" variant="gold" className="w-full h-11 text-base" disabled={loading}>
+        <Button type="submit" variant="gold" className="w-full h-10 text-sm" disabled={loading}>
           {loading ? "Signing in..." : "Sign In"}
         </Button>
       </form>
 
-      <div className="mt-6 pt-6 border-t border-gray-100">
+      <div className="mt-6 pt-6 border-t border-border">
         <Link href="/demo">
-          <Button variant="outline" className="w-full text-naib-navy border-naib-navy/20 hover:bg-naib-navy/5">
+          <Button variant="outline" className="w-full">
             Try Interactive Demo
           </Button>
         </Link>

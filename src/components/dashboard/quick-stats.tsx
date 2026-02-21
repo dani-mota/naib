@@ -12,46 +12,46 @@ interface QuickStatsProps {
 export function QuickStats({ totalAssessed, strongFitRate, avgDuration, weeklyVolume }: QuickStatsProps) {
   const stats = [
     {
-      label: "Total Assessed",
+      label: "TOTAL ASSESSED",
       value: totalAssessed.toString(),
       icon: Users,
       color: "text-naib-blue",
       bg: "bg-naib-blue/10",
     },
     {
-      label: "Strong Fit Rate",
+      label: "STRONG FIT RATE",
       value: `${strongFitRate}%`,
       icon: CheckCircle,
       color: "text-naib-green",
       bg: "bg-naib-green/10",
     },
     {
-      label: "Avg Duration",
+      label: "AVG DURATION",
       value: `${avgDuration}m`,
       icon: Clock,
       color: "text-naib-amber",
       bg: "bg-naib-amber/10",
     },
     {
-      label: "This Week",
+      label: "THIS WEEK",
       value: weeklyVolume.toString(),
       icon: Activity,
-      color: "text-purple-600",
-      bg: "bg-purple-50",
+      color: "text-purple-500",
+      bg: "bg-purple-500/10",
     },
   ];
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {stats.map((stat) => (
-        <div key={stat.label} className="bg-white rounded-xl border border-gray-200 p-4">
+        <div key={stat.label} className="bg-card border border-border p-4">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center`}>
-              <stat.icon className={`w-5 h-5 ${stat.color}`} />
+            <div className={`w-9 h-9 ${stat.bg} flex items-center justify-center`}>
+              <stat.icon className={`w-4 h-4 ${stat.color}`} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-naib-navy">{stat.value}</p>
-              <p className="text-xs text-naib-slate">{stat.label}</p>
+              <p className="text-xl font-bold text-foreground font-mono">{stat.value}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">{stat.label}</p>
             </div>
           </div>
         </div>

@@ -36,11 +36,11 @@ export default async function ComparePage({ searchParams }: PageProps) {
   if (ids.length < 2) {
     return (
       <div className="p-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <h2 className="text-lg font-semibold text-naib-navy mb-2">Select Candidates to Compare</h2>
-          <p className="text-sm text-naib-slate">
+        <div className="bg-card border border-border p-12 text-center">
+          <h2 className="text-sm font-semibold text-foreground mb-2 uppercase tracking-wider">Select Candidates to Compare</h2>
+          <p className="text-xs text-muted-foreground">
             Go to the{" "}
-            <a href="/roles" className="text-naib-blue hover:underline">Role Matrix</a>{" "}
+            <a href="/roles" className="text-naib-gold hover:underline">Role Matrix</a>{" "}
             and select 2-3 candidates to compare side-by-side.
           </p>
         </div>

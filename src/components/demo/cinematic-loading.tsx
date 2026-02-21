@@ -48,16 +48,16 @@ export function CinematicLoading({ onComplete }: CinematicLoadingProps) {
   return (
     <div className="min-h-screen bg-naib-navy flex flex-col items-center justify-center p-4">
       {/* NAIB Logo */}
-      <h1 className="text-4xl font-bold text-white tracking-tight mb-12" style={{ fontFamily: "var(--font-dm-sans)" }}>
+      <h1 className="text-4xl font-bold text-white tracking-[0.2em] mb-12" style={{ fontFamily: "var(--font-dm-sans)" }}>
         NAIB
       </h1>
 
       {/* Messages */}
-      <div className="h-8 mb-8">
+      <div className="h-8 mb-8 relative">
         {MESSAGES.map((msg, i) => (
           <p
             key={i}
-            className={`text-center text-sm transition-all duration-700 absolute left-0 right-0 ${
+            className={`text-center text-xs font-mono uppercase tracking-wider transition-all duration-700 absolute left-0 right-0 ${
               i === currentMsg
                 ? "opacity-100 translate-y-0"
                 : i < currentMsg
@@ -73,16 +73,16 @@ export function CinematicLoading({ onComplete }: CinematicLoadingProps) {
 
       {/* Progress bar */}
       <div className="w-80 max-w-full">
-        <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-0.5 bg-white/10 overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-300 ease-out"
+            className="h-full transition-all duration-300 ease-out"
             style={{
               width: `${Math.min(progress, 100)}%`,
               background: "linear-gradient(90deg, #C9A84C, #E8D48B)",
             }}
           />
         </div>
-        <p className="text-center text-xs text-white/30 mt-3">
+        <p className="text-center text-[10px] text-white/30 mt-3 font-mono">
           {Math.round(Math.min(progress, 100))}% complete
         </p>
       </div>

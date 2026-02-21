@@ -33,27 +33,27 @@ export default function SignupPage() {
       <form onSubmit={handleSignup} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-naib-navy mb-1">First name</label>
+            <label htmlFor="firstName" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">First name</label>
             <Input id="firstName" placeholder="Alex" />
           </div>
           <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-naib-navy mb-1">Last name</label>
+            <label htmlFor="lastName" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">Last name</label>
             <Input id="lastName" placeholder="Chen" />
           </div>
         </div>
         <div>
-          <label htmlFor="company" className="block text-sm font-medium text-naib-navy mb-1">Company</label>
+          <label htmlFor="company" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">Company</label>
           <Input id="company" placeholder="Your company name" />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-naib-navy mb-1">Work email</label>
+          <label htmlFor="email" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">Work email</label>
           <Input id="email" type="email" placeholder="you@company.com" />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-naib-navy mb-1">Password</label>
+          <label htmlFor="password" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">Password</label>
           <Input id="password" type="password" placeholder="••••••••" />
         </div>
-        <Button type="submit" variant="gold" className="w-full h-11 text-base" disabled={loading}>
+        <Button type="submit" variant="gold" className="w-full h-10 text-sm" disabled={loading}>
           {loading ? "Creating account..." : "Get Started"}
         </Button>
       </form>

@@ -34,100 +34,97 @@ export function SpiderChart({ subtestResults, roleWeights }: SpiderChartProps) {
     if (!active || !payload?.length) return null;
     const d = payload[0].payload;
     return (
-      <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200 max-w-xs">
-        <p className="font-semibold text-sm text-naib-navy">{d.fullName}</p>
-        <p className="text-lg font-bold" style={{ color: d.layerColor }}>
+      <div className="bg-card p-3 shadow-lg border border-border max-w-xs">
+        <p className="font-semibold text-xs text-foreground">{d.fullName}</p>
+        <p className="text-sm font-bold font-mono" style={{ color: d.layerColor }}>
           {d.percentile}th percentile
         </p>
         {d.weight > 0 && (
-          <p className="text-xs text-naib-slate mt-1">Role weight: {d.weight}%</p>
+          <p className="text-[10px] text-muted-foreground mt-1 font-mono">Role weight: {d.weight}%</p>
         )}
       </div>
     );
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
+    <div className="bg-card border border-border p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-naib-navy" style={{ fontFamily: "var(--font-dm-sans)" }}>
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider" style={{ fontFamily: "var(--font-dm-sans)" }}>
           Construct Profile
         </h2>
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-0.5">
+        <div className="flex gap-0.5 bg-muted p-0.5">
           <button
             onClick={() => setViewType("radar")}
-            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-              viewType === "radar" ? "bg-white shadow-sm text-naib-navy" : "text-naib-slate hover:text-naib-navy"
+            className={`px-2.5 py-1 text-[10px] font-medium transition-colors ${
+              viewType === "radar" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Radar
+            RADAR
           </button>
           <button
             onClick={() => setViewType("bar")}
-            className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-              viewType === "bar" ? "bg-white shadow-sm text-naib-navy" : "text-naib-slate hover:text-naib-navy"
+            className={`px-2.5 py-1 text-[10px] font-medium transition-colors ${
+              viewType === "bar" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Bar
+            BAR
           </button>
         </div>
       </div>
 
       {viewType === "radar" ? (
-        <div className="h-[400px]">
+        <div className="h-[380px]">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="75%" data={data}>
-              <PolarGrid stroke="#e2e8f0" />
+              <PolarGrid stroke="var(--border)" />
               <PolarAngleAxis
                 dataKey="construct"
-                tick={{ fill: "#64748b", fontSize: 11 }}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
               />
               <PolarRadiusAxis
                 angle={90}
                 domain={[0, 100]}
-                tick={{ fill: "#94a3b8", fontSize: 10 }}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
                 tickCount={5}
               />
-              {/* 50th percentile reference */}
               <Radar
                 name="Average"
                 dataKey="average"
-                stroke="#94a3b8"
+                stroke="var(--muted-foreground)"
                 strokeDasharray="4 4"
                 fill="none"
                 strokeWidth={1}
               />
-              {/* Candidate scores */}
               <Radar
                 name="Score"
                 dataKey="percentile"
                 stroke="#2563EB"
                 fill="#2563EB"
-                fillOpacity={0.15}
+                fillOpacity={0.12}
                 strokeWidth={2}
-                dot={{ fill: "#2563EB", r: 4 }}
+                dot={{ fill: "#2563EB", r: 3 }}
               />
               <Tooltip content={<CustomTooltip />} />
             </RadarChart>
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {data.map((d) => (
             <div key={d.construct} className="flex items-center gap-3">
-              <span className="w-8 text-xs font-medium text-naib-slate text-right">{d.construct}</span>
-              <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden relative">
+              <span className="w-7 text-[10px] font-mono font-medium text-muted-foreground text-right">{d.construct}</span>
+              <div className="flex-1 h-5 bg-muted overflow-hidden relative">
                 <div
-                  className="h-full rounded-full transition-all duration-500"
+                  className="h-full transition-all duration-500"
                   style={{
                     width: `${d.percentile}%`,
                     backgroundColor: d.layerColor,
                     opacity: 0.8,
                   }}
                 />
-                {/* 50th percentile marker */}
-                <div className="absolute top-0 bottom-0 left-[50%] w-px bg-gray-400 border-dashed" />
+                <div className="absolute top-0 bottom-0 left-[50%] w-px bg-muted-foreground/30" />
               </div>
-              <span className="w-10 text-xs font-medium tabular-nums text-right" style={{ color: d.layerColor }}>
+              <span className="w-8 text-[10px] font-mono font-medium tabular-nums text-right" style={{ color: d.layerColor }}>
                 {d.percentile}
               </span>
             </div>
@@ -135,12 +132,11 @@ export function SpiderChart({ subtestResults, roleWeights }: SpiderChartProps) {
         </div>
       )}
 
-      {/* Legend */}
-      <div className="flex justify-center gap-6 mt-4 pt-4 border-t border-gray-100">
+      <div className="flex justify-center gap-5 mt-4 pt-3 border-t border-border">
         {Object.entries(LAYER_INFO).map(([key, info]) => (
           <div key={key} className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: info.color }} />
-            <span className="text-xs text-naib-slate">{info.name}</span>
+            <div className="w-2 h-2" style={{ backgroundColor: info.color }} />
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{info.name}</span>
           </div>
         ))}
       </div>

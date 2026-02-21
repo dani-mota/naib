@@ -11,9 +11,9 @@ export function ScoreBar({ percentile, showLabel = true, height = 6 }: ScoreBarP
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 bg-gray-100 rounded-full overflow-hidden" style={{ height }}>
+      <div className="flex-1 bg-muted overflow-hidden" style={{ height }}>
         <div
-          className="h-full rounded-full transition-all duration-300"
+          className="h-full transition-all duration-300"
           style={{
             width: `${percentile}%`,
             backgroundColor: tier.color,
@@ -21,7 +21,7 @@ export function ScoreBar({ percentile, showLabel = true, height = 6 }: ScoreBarP
         />
       </div>
       {showLabel && (
-        <span className="text-xs font-medium tabular-nums min-w-[2rem] text-right" style={{ color: tier.color }}>
+        <span className="text-[10px] font-mono font-medium tabular-nums min-w-[2rem] text-right" style={{ color: tier.color }}>
           {percentile}
         </span>
       )}

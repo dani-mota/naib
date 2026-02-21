@@ -88,14 +88,14 @@ export function MiniAssessment({ onComplete }: MiniAssessmentProps) {
       <div className="w-full max-w-2xl relative z-10">
         {/* Progress */}
         <div className="flex items-center justify-between mb-6">
-          <span className="text-sm text-white/60">
+          <span className="text-xs text-white/60 uppercase tracking-wider font-mono">
             Question {current + 1} of {QUESTIONS.length}
           </span>
           <div className="flex gap-1.5">
             {QUESTIONS.map((_, i) => (
               <div
                 key={i}
-                className={`h-1.5 w-8 rounded-full transition-colors ${
+                className={`h-1 w-8 transition-colors ${
                   i <= current ? "bg-naib-gold" : "bg-white/20"
                 }`}
               />
@@ -104,29 +104,29 @@ export function MiniAssessment({ onComplete }: MiniAssessmentProps) {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-card border border-border shadow-lg p-8">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs px-2 py-0.5 bg-naib-blue/10 text-naib-blue rounded-full font-medium">
+            <span className="text-[10px] px-2 py-0.5 bg-naib-blue/10 text-naib-blue font-medium font-mono uppercase tracking-wider">
               {question.title}
             </span>
           </div>
 
-          <h2 className="text-lg font-semibold text-naib-navy mb-6">
+          <h2 className="text-sm font-semibold text-foreground mb-6">
             {question.prompt}
           </h2>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {question.options.map((option, i) => (
               <button
                 key={i}
                 onClick={() => setSelected(option.value)}
-                className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                className={`w-full text-left p-3 border-2 transition-all ${
                   selected === option.value
-                    ? "border-naib-blue bg-naib-blue/5"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-naib-gold bg-naib-gold/5"
+                    : "border-border hover:border-muted-foreground/30"
                 }`}
               >
-                <span className="text-sm text-gray-700">{option.label}</span>
+                <span className="text-xs text-foreground">{option.label}</span>
               </button>
             ))}
           </div>
@@ -143,7 +143,7 @@ export function MiniAssessment({ onComplete }: MiniAssessmentProps) {
           </div>
         </div>
 
-        <p className="text-center text-xs text-white/40 mt-4">
+        <p className="text-center text-[10px] text-white/40 mt-4 uppercase tracking-wider">
           This is a simplified demo. The full assessment takes 45-60 minutes.
         </p>
       </div>

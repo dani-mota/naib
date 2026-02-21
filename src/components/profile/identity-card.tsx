@@ -10,29 +10,29 @@ interface IdentityCardProps {
 
 export function IdentityCard({ candidate }: IdentityCardProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
+    <div className="bg-card border border-border p-4">
       <div className="flex flex-col items-center text-center">
         <InitialsBadge firstName={candidate.firstName} lastName={candidate.lastName} size="lg" />
-        <h2 className="mt-3 text-lg font-semibold text-naib-navy">
+        <h2 className="mt-2 text-sm font-semibold text-foreground">
           {candidate.firstName} {candidate.lastName}
         </h2>
-        <p className="text-sm text-naib-slate">{candidate.primaryRole.name}</p>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono">{candidate.primaryRole.name}</p>
       </div>
 
-      <div className="mt-4 space-y-2.5">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Mail className="w-4 h-4 text-naib-slate" />
-          <span className="truncate">{candidate.email}</span>
+      <div className="mt-3 pt-3 border-t border-border space-y-2">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Mail className="w-3.5 h-3.5" />
+          <span className="truncate font-mono text-[11px]">{candidate.email}</span>
         </div>
         {candidate.phone && (
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Phone className="w-4 h-4 text-naib-slate" />
-            <span>{candidate.phone}</span>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Phone className="w-3.5 h-3.5" />
+            <span className="font-mono text-[11px]">{candidate.phone}</span>
           </div>
         )}
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Calendar className="w-4 h-4 text-naib-slate" />
-          <span>Assessed {formatRelativeDate(new Date(candidate.createdAt))}</span>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Calendar className="w-3.5 h-3.5" />
+          <span className="text-[11px]">Assessed {formatRelativeDate(new Date(candidate.createdAt))}</span>
         </div>
       </div>
     </div>

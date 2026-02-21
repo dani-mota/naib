@@ -61,28 +61,24 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-naib-navy" style={{ fontFamily: "var(--font-dm-sans)" }}>
+        <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
           Assessment Dashboard
         </h1>
-        <p className="text-sm text-naib-slate mt-1">
+        <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">
           Overview of your talent assessment pipeline
         </p>
       </div>
 
-      {/* Quick Stats */}
       <QuickStats {...stats} />
 
-      {/* Pipeline by Role */}
       <div>
-        <h2 className="text-sm font-medium text-naib-slate uppercase tracking-wider mb-3">Pipeline by Role</h2>
+        <h2 className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-3">Pipeline by Role</h2>
         <PipelineCards roles={rolePipelines} />
       </div>
 
-      {/* Candidate Table */}
       <div>
-        <h2 className="text-sm font-medium text-naib-slate uppercase tracking-wider mb-3">All Candidates</h2>
+        <h2 className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-3">All Candidates</h2>
         <CandidateTable candidates={candidates} />
       </div>
     </div>

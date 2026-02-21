@@ -12,24 +12,23 @@ interface AuthCardProps {
 export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 relative z-10">
-        {/* NAIB Logo */}
+      <div className="bg-card border border-border shadow-lg p-8 relative z-10">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-naib-navy" style={{ fontFamily: "var(--font-dm-sans)" }}>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
             NAIB
           </h1>
-          <p className="text-xs tracking-[0.3em] text-naib-slate mt-1 uppercase">
+          <p className="text-[10px] tracking-[0.3em] text-muted-foreground mt-1 uppercase font-mono">
             NextGen Aptitude & Integrity Battery
           </p>
         </div>
 
-        <h2 className="text-xl font-semibold text-naib-navy mb-1">{title}</h2>
-        {subtitle && <p className="text-sm text-naib-slate mb-6">{subtitle}</p>}
+        <h2 className="text-lg font-semibold text-foreground mb-1">{title}</h2>
+        {subtitle && <p className="text-sm text-muted-foreground mb-6">{subtitle}</p>}
 
         {children}
       </div>
       {footer && (
-        <div className="text-center mt-4 text-sm text-white/60">
+        <div className="text-center mt-4 text-xs text-white/60">
           {footer}
         </div>
       )}

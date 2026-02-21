@@ -59,16 +59,16 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
     .map(([key]) => CONSTRUCTS[key as keyof typeof CONSTRUCTS]?.name);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Demo Banner */}
-      <div className="bg-naib-gold text-naib-navy text-center py-2 px-4 text-sm font-medium">
+      <div className="bg-naib-gold text-naib-navy text-center py-2 px-4 text-xs font-medium uppercase tracking-wider">
         You&apos;re viewing the interactive demo.{" "}
         <Link href="/signup" className="underline font-bold">Create an account</Link> to assess your real candidates.
       </div>
 
       {/* Nav */}
-      <header className="h-14 bg-naib-navy border-b border-white/10 flex items-center justify-between px-6">
-        <span className="text-xl font-bold text-white" style={{ fontFamily: "var(--font-dm-sans)" }}>
+      <header className="h-12 bg-card border-b border-border flex items-center justify-between px-6">
+        <span className="text-lg font-bold text-foreground tracking-[0.15em]" style={{ fontFamily: "var(--font-dm-sans)" }}>
           NAIB
         </span>
         <Link href="/signup">
@@ -76,37 +76,37 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
         </Link>
       </header>
 
-      <div className="max-w-5xl mx-auto p-6 space-y-6">
+      <div className="max-w-5xl mx-auto p-6 space-y-4">
         {/* Your Results Header */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-card border border-border p-5">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-naib-navy" style={{ fontFamily: "var(--font-dm-sans)" }}>
+              <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
                 Your Assessment Results
               </h1>
-              <p className="text-sm text-naib-slate mt-1">
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">
                 Based on your 4-question mini assessment (full version: 12 constructs, 45-60 min)
               </p>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-bold text-naib-navy">{compositeScore}</div>
+              <div className="text-2xl font-bold text-foreground font-mono">{compositeScore}</div>
               <StatusBadge status={status} />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
           {/* Chart */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-naib-navy mb-4">Your Construct Profile</h2>
+          <div className="bg-card border border-border p-5">
+            <h2 className="text-xs font-semibold text-foreground mb-4 uppercase tracking-wider">Your Construct Profile</h2>
             <div className="h-[380px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
-                  <PolarGrid stroke="#e2e8f0" />
-                  <PolarAngleAxis dataKey="construct" tick={{ fill: "#64748b", fontSize: 11 }} />
-                  <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#94a3b8", fontSize: 10 }} tickCount={5} />
+                  <PolarGrid stroke="var(--border)" />
+                  <PolarAngleAxis dataKey="construct" tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} />
+                  <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "var(--muted-foreground)", fontSize: 9 }} tickCount={5} />
                   <Radar name="Average" dataKey="average" stroke="#94a3b8" strokeDasharray="4 4" fill="none" strokeWidth={1} />
-                  <Radar name="You" dataKey="percentile" stroke="#2563EB" fill="#2563EB" fillOpacity={0.15} strokeWidth={2} dot={{ fill: "#2563EB", r: 4 }} />
+                  <Radar name="You" dataKey="percentile" stroke="#2563EB" fill="#2563EB" fillOpacity={0.15} strokeWidth={2} dot={{ fill: "#2563EB", r: 3 }} />
                   <Tooltip />
                 </RadarChart>
               </ResponsiveContainer>
@@ -114,41 +114,41 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
           </div>
 
           {/* Side panel */}
-          <div className="space-y-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-sm font-medium text-naib-navy mb-3">Top Strengths</h3>
+          <div className="space-y-3">
+            <div className="bg-card border border-border p-4">
+              <h3 className="text-[10px] font-medium text-muted-foreground mb-3 uppercase tracking-wider">Top Strengths</h3>
               <div className="space-y-2">
                 {strengths.map((name) => (
-                  <div key={name} className="flex items-center gap-2 text-sm">
-                    <div className="w-2 h-2 rounded-full bg-naib-green" />
-                    <span className="text-gray-700">{name}</span>
+                  <div key={name} className="flex items-center gap-2 text-xs">
+                    <div className="w-2 h-2 bg-naib-green" />
+                    <span className="text-foreground">{name}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-sm font-medium text-naib-navy mb-3">Development Areas</h3>
+            <div className="bg-card border border-border p-4">
+              <h3 className="text-[10px] font-medium text-muted-foreground mb-3 uppercase tracking-wider">Development Areas</h3>
               <div className="space-y-2">
                 {devAreas.map((name) => (
-                  <div key={name} className="flex items-center gap-2 text-sm">
-                    <div className="w-2 h-2 rounded-full bg-naib-amber" />
-                    <span className="text-gray-700">{name}</span>
+                  <div key={name} className="flex items-center gap-2 text-xs">
+                    <div className="w-2 h-2 bg-naib-amber" />
+                    <span className="text-foreground">{name}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-sm font-medium text-naib-navy mb-3">Construct Scores</h3>
+            <div className="bg-card border border-border p-4">
+              <h3 className="text-[10px] font-medium text-muted-foreground mb-3 uppercase tracking-wider">Construct Scores</h3>
               <div className="space-y-2">
                 {Object.entries(CONSTRUCTS).map(([key, meta]) => (
                   <div key={key}>
-                    <div className="flex justify-between text-xs text-naib-slate mb-0.5">
-                      <span>{meta.abbreviation}</span>
-                      <span className="font-medium">{scores[key]}</span>
+                    <div className="flex justify-between text-[10px] text-muted-foreground mb-0.5">
+                      <span className="font-mono">{meta.abbreviation}</span>
+                      <span className="font-medium font-mono">{scores[key]}</span>
                     </div>
-                    <ScoreBar percentile={scores[key] ?? 0} showLabel={false} height={3} />
+                    <ScoreBar percentile={scores[key] ?? 0} showLabel={false} height={2} />
                   </div>
                 ))}
               </div>
@@ -157,11 +157,11 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
         </div>
 
         {/* CTA */}
-        <div className="bg-naib-navy rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "var(--font-dm-sans)" }}>
+        <div className="bg-naib-navy p-8 text-center">
+          <h2 className="text-xl font-bold text-white mb-2 tracking-wider" style={{ fontFamily: "var(--font-dm-sans)" }}>
             Ready to assess your real candidates?
           </h2>
-          <p className="text-white/60 mb-6 max-w-lg mx-auto text-sm">
+          <p className="text-white/60 mb-6 max-w-lg mx-auto text-xs uppercase tracking-wider">
             NAIB measures 12 cognitive, technical, and behavioral constructs in 45-60 minutes.
             Get composite scores, intelligence reports, and actionable hiring recommendations.
           </p>

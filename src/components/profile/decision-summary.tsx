@@ -15,36 +15,36 @@ export function DecisionSummary({ candidate, compositeScore, roleName }: Decisio
   const redFlags = candidate.assessment?.redFlags || [];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+    <div className="bg-card border border-border p-4 space-y-3">
       <div>
-        <p className="text-xs text-naib-slate uppercase tracking-wider mb-2">Decision</p>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1.5">Decision</p>
         <StatusBadge status={candidate.status} />
       </div>
 
       <div>
-        <p className="text-xs text-naib-slate uppercase tracking-wider mb-2">
+        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1.5">
           {roleName} Composite
         </p>
         <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-naib-navy">
+          <span className="text-xl font-bold text-foreground font-mono">
             {compositeScore?.percentile ?? "—"}
           </span>
-          <span className="text-sm text-naib-slate">/ 100</span>
+          <span className="text-[10px] text-muted-foreground font-mono">/ 100</span>
         </div>
-        <ScoreBar percentile={compositeScore?.percentile ?? 0} showLabel={false} height={8} />
-        <p className="text-xs text-naib-slate mt-1">
-          {compositeScore?.passed ? "Above cutline" : `${Math.abs(compositeScore?.distanceFromCutline ?? 0)} pts from cutline`}
+        <ScoreBar percentile={compositeScore?.percentile ?? 0} showLabel={false} height={6} />
+        <p className="text-[10px] text-muted-foreground mt-1 font-mono">
+          {compositeScore?.passed ? "ABOVE CUTLINE" : `${Math.abs(compositeScore?.distanceFromCutline ?? 0)} PTS FROM CUTLINE`}
         </p>
       </div>
 
       {redFlags.length > 0 && (
         <div>
-          <p className="text-xs text-naib-slate uppercase tracking-wider mb-2">Flags</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1.5">Flags</p>
           {redFlags.map((flag: any) => (
-            <div key={flag.id} className={`flex items-start gap-2 text-xs p-2 rounded mb-1 ${
-              flag.severity === "CRITICAL" ? "bg-red-50 text-red-700" : flag.severity === "WARNING" ? "bg-amber-50 text-amber-700" : "bg-blue-50 text-blue-700"
+            <div key={flag.id} className={`flex items-start gap-2 text-[11px] p-2 mb-1 border ${
+              flag.severity === "CRITICAL" ? "bg-naib-red/5 border-naib-red/20 text-naib-red" : flag.severity === "WARNING" ? "bg-naib-amber/5 border-naib-amber/20 text-naib-amber" : "bg-naib-blue/5 border-naib-blue/20 text-naib-blue"
             }`}>
-              <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+              <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
               <span>{flag.title}</span>
             </div>
           ))}
@@ -52,24 +52,24 @@ export function DecisionSummary({ candidate, compositeScore, roleName }: Decisio
       )}
 
       {prediction && (
-        <div className="space-y-2.5 pt-2 border-t border-gray-100">
+        <div className="space-y-2 pt-2 border-t border-border">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs text-naib-slate">
-              <Clock className="w-3.5 h-3.5" /> Ramp Time
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+              <Clock className="w-3 h-3" /> RAMP TIME
             </div>
-            <span className="text-xs font-medium text-naib-navy">{prediction.rampTimeLabel}</span>
+            <span className="text-[10px] font-mono font-medium text-foreground">{prediction.rampTimeLabel}</span>
           </div>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs text-naib-slate">
-              <Eye className="w-3.5 h-3.5" /> Supervision
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+              <Eye className="w-3 h-3" /> SUPERVISION
             </div>
-            <span className="text-xs font-medium text-naib-navy">{prediction.supervisionLoad}</span>
+            <span className="text-[10px] font-mono font-medium text-foreground">{prediction.supervisionLoad}</span>
           </div>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs text-naib-slate">
-              <TrendingUp className="w-3.5 h-3.5" /> Ceiling
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+              <TrendingUp className="w-3 h-3" /> CEILING
             </div>
-            <span className="text-xs font-medium text-naib-navy">{prediction.performanceCeiling}</span>
+            <span className="text-[10px] font-mono font-medium text-foreground">{prediction.performanceCeiling}</span>
           </div>
         </div>
       )}

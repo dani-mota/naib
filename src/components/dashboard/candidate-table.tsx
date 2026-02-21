@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, Filter, ChevronUp, ChevronDown, AlertTriangle } from "lucide-react";
+import { Search, ChevronUp, ChevronDown, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ScoreBar } from "@/components/ui/score-bar";
@@ -110,30 +110,30 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return null;
     return sortDir === "asc" ? (
-      <ChevronUp className="w-3.5 h-3.5" />
+      <ChevronUp className="w-3 h-3" />
     ) : (
-      <ChevronDown className="w-3.5 h-3.5" />
+      <ChevronDown className="w-3 h-3" />
     );
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200">
+    <div className="bg-card border border-border">
       {/* Toolbar */}
-      <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-3">
+      <div className="p-3 border-b border-border flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <Input
             placeholder="Search candidates..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="pl-9 h-8 text-xs"
           />
         </div>
         <div className="flex gap-2">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-9 rounded-md border border-gray-200 px-3 text-sm text-gray-700 bg-white"
+            className="h-8 border border-border px-2 text-xs text-foreground bg-card"
           >
             <option value="">All Statuses</option>
             <option value="RECOMMENDED">Strong Fit</option>
@@ -143,17 +143,13 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="h-9 rounded-md border border-gray-200 px-3 text-sm text-gray-700 bg-white"
+            className="h-8 border border-border px-2 text-xs text-foreground bg-card"
           >
             <option value="">All Roles</option>
             {roles.map((r) => (
               <option key={r.slug} value={r.slug}>{r.name}</option>
             ))}
           </select>
-          <button className="h-9 px-3 rounded-md border border-gray-200 text-sm text-gray-500 hover:bg-gray-50 flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5" />
-            Filters
-          </button>
         </div>
       </div>
 
@@ -161,32 +157,32 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-100">
-              <th className="text-left py-3 px-4 text-xs font-medium text-naib-slate uppercase tracking-wider">
-                <button onClick={() => handleSort("name")} className="flex items-center gap-1 hover:text-naib-navy">
+            <tr className="border-b border-border">
+              <th className="text-left py-2.5 px-4 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                <button onClick={() => handleSort("name")} className="flex items-center gap-1 hover:text-foreground">
                   Candidate <SortIcon field="name" />
                 </button>
               </th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-naib-slate uppercase tracking-wider">
-                <button onClick={() => handleSort("role")} className="flex items-center gap-1 hover:text-naib-navy">
+              <th className="text-left py-2.5 px-4 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                <button onClick={() => handleSort("role")} className="flex items-center gap-1 hover:text-foreground">
                   Role <SortIcon field="role" />
                 </button>
               </th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-naib-slate uppercase tracking-wider">
-                <button onClick={() => handleSort("score")} className="flex items-center gap-1 hover:text-naib-navy">
+              <th className="text-left py-2.5 px-4 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                <button onClick={() => handleSort("score")} className="flex items-center gap-1 hover:text-foreground">
                   Composite <SortIcon field="score" />
                 </button>
               </th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-naib-slate uppercase tracking-wider">
-                <button onClick={() => handleSort("status")} className="flex items-center gap-1 hover:text-naib-navy">
+              <th className="text-left py-2.5 px-4 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                <button onClick={() => handleSort("status")} className="flex items-center gap-1 hover:text-foreground">
                   Status <SortIcon field="status" />
                 </button>
               </th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-naib-slate uppercase tracking-wider">
+              <th className="text-left py-2.5 px-4 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
                 Flags
               </th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-naib-slate uppercase tracking-wider">
-                <button onClick={() => handleSort("date")} className="flex items-center gap-1 hover:text-naib-navy">
+              <th className="text-left py-2.5 px-4 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                <button onClick={() => handleSort("date")} className="flex items-center gap-1 hover:text-foreground">
                   Assessed <SortIcon field="date" />
                 </button>
               </th>
@@ -201,38 +197,38 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
               return (
                 <tr
                   key={candidate.id}
-                  className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
+                  className="border-b border-border/50 hover:bg-accent/50 transition-colors"
                 >
-                  <td className="py-3 px-4">
+                  <td className="py-2.5 px-4">
                     <Link href={`/candidates/${candidate.id}`} className="flex items-center gap-3 group">
                       <InitialsBadge firstName={candidate.firstName} lastName={candidate.lastName} size="sm" />
                       <div>
-                        <p className="text-sm font-medium text-naib-navy group-hover:text-naib-blue transition-colors">
+                        <p className="text-xs font-medium text-foreground group-hover:text-naib-gold transition-colors">
                           {candidate.firstName} {candidate.lastName}
                         </p>
-                        <p className="text-xs text-naib-slate">{candidate.email}</p>
+                        <p className="text-[10px] text-muted-foreground font-mono">{candidate.email}</p>
                       </div>
                     </Link>
                   </td>
-                  <td className="py-3 px-4">
-                    <span className="text-sm text-gray-700">{candidate.primaryRole.name}</span>
+                  <td className="py-2.5 px-4">
+                    <span className="text-xs text-muted-foreground">{candidate.primaryRole.name}</span>
                   </td>
-                  <td className="py-3 px-4 w-40">
+                  <td className="py-2.5 px-4 w-36">
                     <ScoreBar percentile={composite} />
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-2.5 px-4">
                     <StatusBadge status={candidate.status} size="sm" />
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="py-2.5 px-4">
                     {flagCount > 0 && (
-                      <span className={`flex items-center gap-1 text-xs font-medium ${hasCritical ? "text-red-600" : "text-amber-600"}`}>
-                        <AlertTriangle className="w-3.5 h-3.5" />
+                      <span className={`flex items-center gap-1 text-[10px] font-mono font-medium ${hasCritical ? "text-naib-red" : "text-naib-amber"}`}>
+                        <AlertTriangle className="w-3 h-3" />
                         {flagCount}
                       </span>
                     )}
                   </td>
-                  <td className="py-3 px-4">
-                    <span className="text-sm text-naib-slate">
+                  <td className="py-2.5 px-4">
+                    <span className="text-[10px] text-muted-foreground font-mono">
                       {formatRelativeDate(new Date(candidate.createdAt))}
                     </span>
                   </td>
@@ -243,14 +239,14 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
         </table>
 
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-naib-slate">
-            <p className="text-sm">No candidates found matching your filters.</p>
+          <div className="text-center py-12 text-muted-foreground">
+            <p className="text-xs">No candidates found matching your filters.</p>
           </div>
         )}
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-100 flex items-center justify-between text-sm text-naib-slate">
+      <div className="p-3 border-t border-border flex items-center justify-between text-[10px] text-muted-foreground font-mono uppercase tracking-wider">
         <span>Showing {filtered.length} of {candidates.length} candidates</span>
       </div>
     </div>

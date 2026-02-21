@@ -26,12 +26,12 @@ export default function ForgotPasswordPage() {
     >
       {sent ? (
         <div className="text-center py-4">
-          <div className="w-16 h-16 bg-naib-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-naib-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-14 h-14 bg-naib-green/10 border border-naib-green/20 flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-naib-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <p className="text-sm text-naib-slate">
+          <p className="text-xs text-muted-foreground">
             Didn&apos;t receive the email? Check your spam folder or{" "}
             <button onClick={() => setSent(false)} className="text-naib-blue hover:underline">try again</button>.
           </p>
@@ -39,10 +39,10 @@ export default function ForgotPasswordPage() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-naib-navy mb-1">Email</label>
+            <label htmlFor="email" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">Email</label>
             <Input id="email" type="email" placeholder="you@company.com" />
           </div>
-          <Button type="submit" variant="gold" className="w-full h-11 text-base">
+          <Button type="submit" variant="gold" className="w-full h-10 text-sm">
             Send Reset Link
           </Button>
         </form>

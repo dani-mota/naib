@@ -34,41 +34,41 @@ export function IntelligenceReport({ subtestResults, roleName }: IntelligenceRep
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-naib-navy mb-4" style={{ fontFamily: "var(--font-dm-sans)" }}>
+    <div className="bg-card border border-border p-5">
+      <h2 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wider" style={{ fontFamily: "var(--font-dm-sans)" }}>
         Candidate Intelligence Report
       </h2>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         {panels.map((panel, i) => {
           const isOpen = openPanels.has(i);
           const Icon = ICONS[panel.icon] || ClipboardCheck;
 
           return (
-            <div key={i} className="border border-gray-200 rounded-lg overflow-hidden">
+            <div key={i} className="border border-border overflow-hidden">
               <button
                 onClick={() => toggle(i)}
-                className="w-full flex items-center gap-3 p-4 text-left hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center gap-3 p-3 text-left hover:bg-accent transition-colors"
               >
-                <Icon className="w-5 h-5 text-naib-blue shrink-0" />
-                <span className="flex-1 text-sm font-medium text-naib-navy">{panel.title}</span>
+                <Icon className="w-4 h-4 text-naib-blue shrink-0" />
+                <span className="flex-1 text-xs font-medium text-foreground">{panel.title}</span>
                 {isOpen ? (
-                  <ChevronDown className="w-4 h-4 text-naib-slate" />
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
                 ) : (
-                  <ChevronRight className="w-4 h-4 text-naib-slate" />
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                 )}
               </button>
 
               {isOpen && (
-                <div className="px-4 pb-4 border-t border-gray-100">
-                  <p className="text-sm text-gray-700 leading-relaxed mt-3">
+                <div className="px-3 pb-3 border-t border-border">
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-2.5">
                     {panel.narrative}
                   </p>
                   {panel.keyPoints.length > 0 && (
-                    <ul className="mt-3 space-y-1.5">
+                    <ul className="mt-2 space-y-1">
                       {panel.keyPoints.map((point, j) => (
-                        <li key={j} className="flex items-start gap-2 text-xs text-naib-slate">
-                          <span className="w-1.5 h-1.5 rounded-full bg-naib-blue mt-1.5 shrink-0" />
+                        <li key={j} className="flex items-start gap-2 text-[11px] text-muted-foreground">
+                          <span className="w-1 h-1 bg-naib-gold mt-1.5 shrink-0" />
                           {point}
                         </li>
                       ))}

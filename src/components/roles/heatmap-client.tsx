@@ -79,17 +79,16 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
     return "rgba(220, 38, 38, 0.12)";
   };
 
-  // Find cutline position
   const cutlineIndex = rows.findIndex((r) => !r.passed);
 
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-naib-navy" style={{ fontFamily: "var(--font-dm-sans)" }}>
+          <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
             Role Matrix
           </h1>
-          <p className="text-sm text-naib-slate mt-1">
+          <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">
             Candidate scores by construct for each role
           </p>
         </div>
@@ -98,7 +97,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
           {selectedIds.size >= 2 && (
             <button
               onClick={handleCompare}
-              className="px-4 py-2 bg-naib-gold text-naib-navy text-sm font-semibold rounded-lg hover:bg-naib-gold/90 transition-colors"
+              className="px-4 py-2 bg-naib-gold text-naib-navy text-xs font-semibold uppercase tracking-wider hover:bg-naib-gold/90 transition-colors"
             >
               Compare Selected ({selectedIds.size})
             </button>
@@ -106,7 +105,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
           <select
             value={selectedRoleSlug}
             onChange={(e) => setSelectedRoleSlug(e.target.value)}
-            className="h-9 rounded-lg border border-gray-200 px-3 text-sm bg-white"
+            className="h-8 border border-border px-3 text-xs bg-card text-foreground font-mono"
           >
             {roles.map((r: any) => (
               <option key={r.slug} value={r.slug}>{r.name}</option>
@@ -116,15 +115,15 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
       </div>
 
       {/* Heatmap */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
-        <table className="w-full text-xs">
+      <div className="bg-card border border-border overflow-x-auto">
+        <table className="w-full text-[10px]">
           <thead>
-            <tr className="border-b border-gray-200">
-              <th className="sticky left-0 bg-white z-10 py-3 px-3 text-left font-medium text-naib-slate w-8" />
-              <th className="sticky left-8 bg-white z-10 py-3 px-3 text-left font-medium text-naib-slate min-w-[150px]">
+            <tr className="border-b border-border">
+              <th className="sticky left-0 bg-card z-10 py-2.5 px-2.5 text-left font-medium text-muted-foreground w-8" />
+              <th className="sticky left-8 bg-card z-10 py-2.5 px-2.5 text-left font-medium text-muted-foreground uppercase tracking-wider min-w-[140px]">
                 Candidate
               </th>
-              <th className="py-3 px-2 text-center font-semibold text-naib-navy min-w-[50px]">
+              <th className="py-2.5 px-2 text-center font-semibold text-foreground min-w-[46px] uppercase tracking-wider">
                 CI
               </th>
               {CONSTRUCT_ORDER.map((key) => {
@@ -135,11 +134,11 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                 return (
                   <th
                     key={key}
-                    className={`py-3 px-2 text-center font-medium min-w-[46px] ${isHighWeight ? "border-l-2 border-l-naib-gold" : ""}`}
+                    className={`py-2.5 px-1.5 text-center font-medium min-w-[42px] ${isHighWeight ? "border-l-2 border-l-naib-gold" : ""}`}
                     style={{ borderTop: `3px solid ${layerInfo.color}` }}
                     title={meta.name}
                   >
-                    <span style={{ color: layerInfo.color }}>{meta.abbreviation}</span>
+                    <span className="font-mono" style={{ color: layerInfo.color }}>{meta.abbreviation}</span>
                   </th>
                 );
               })}
@@ -149,29 +148,29 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
             {rows.map((row, i) => (
               <tr
                 key={row.id}
-                className={`border-b hover:bg-gray-50/50 transition-colors ${
-                  cutlineIndex === i ? "border-b-2 border-b-red-300 border-dashed" : "border-gray-100"
+                className={`border-b hover:bg-accent/30 transition-colors ${
+                  cutlineIndex === i ? "border-b-2 border-b-naib-red/50 border-dashed" : "border-border/50"
                 }`}
               >
-                <td className="sticky left-0 bg-white py-2 px-3">
+                <td className="sticky left-0 bg-card py-1.5 px-2.5">
                   <input
                     type="checkbox"
                     checked={selectedIds.has(row.id)}
                     onChange={() => toggleSelect(row.id)}
-                    className="rounded border-gray-300"
+                    className="border-border"
                   />
                 </td>
-                <td className="sticky left-8 bg-white py-2 px-3">
+                <td className="sticky left-8 bg-card py-1.5 px-2.5">
                   <Link
                     href={`/candidates/${row.id}`}
-                    className="text-sm font-medium text-naib-navy hover:text-naib-blue transition-colors"
+                    className="text-xs font-medium text-foreground hover:text-naib-gold transition-colors"
                   >
                     {row.name}
                   </Link>
                 </td>
-                <td className="py-2 px-2 text-center">
+                <td className="py-1.5 px-2 text-center">
                   <span
-                    className="inline-flex items-center justify-center w-10 h-7 rounded text-xs font-bold"
+                    className="inline-flex items-center justify-center w-9 h-6 text-[10px] font-bold font-mono"
                     style={{
                       backgroundColor: getCellBg(row.composite),
                       color: getCellColor(row.composite),
@@ -186,11 +185,11 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                   return (
                     <td
                       key={key}
-                      className={`py-2 px-2 text-center ${isHighWeight ? "border-l-2 border-l-naib-gold/30" : ""}`}
+                      className={`py-1.5 px-1.5 text-center ${isHighWeight ? "border-l-2 border-l-naib-gold/30" : ""}`}
                       title={`${CONSTRUCTS[key as keyof typeof CONSTRUCTS].name}: ${formatPercentile(val)}`}
                     >
                       <span
-                        className="inline-flex items-center justify-center w-10 h-7 rounded text-xs font-medium"
+                        className="inline-flex items-center justify-center w-9 h-6 text-[10px] font-medium font-mono"
                         style={{
                           backgroundColor: getCellBg(val),
                           color: getCellColor(val),
@@ -208,9 +207,9 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-between mt-4 text-xs text-naib-slate">
-        <div className="flex items-center gap-4">
-          <span className="font-medium">Score Tiers:</span>
+      <div className="flex items-center justify-between mt-3 text-[10px] text-muted-foreground">
+        <div className="flex items-center gap-3">
+          <span className="font-medium uppercase tracking-wider">Score Tiers:</span>
           {[
             { label: "90+", color: "#065F46", bg: "rgba(6,95,70,0.15)" },
             { label: "75-89", color: "#059669", bg: "rgba(5,150,105,0.12)" },
@@ -219,16 +218,16 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
             { label: "<25", color: "#DC2626", bg: "rgba(220,38,38,0.12)" },
           ].map((t) => (
             <div key={t.label} className="flex items-center gap-1">
-              <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-medium" style={{ backgroundColor: t.bg, color: t.color }}>
+              <span className="w-5 h-5 flex items-center justify-center text-[9px] font-bold font-mono" style={{ backgroundColor: t.bg, color: t.color }}>
                 {t.label.split("-")[0]}
               </span>
-              <span>{t.label}</span>
+              <span className="font-mono">{t.label}</span>
             </div>
           ))}
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-0.5 border-t-2 border-dashed border-red-300" />
-          <span>Cutline</span>
+          <div className="w-4 h-0.5 border-t-2 border-dashed border-naib-red/50" />
+          <span className="uppercase tracking-wider">Cutline</span>
         </div>
       </div>
     </div>

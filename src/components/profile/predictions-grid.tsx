@@ -41,21 +41,21 @@ export function PredictionsGrid({ prediction }: PredictionsGridProps) {
   ];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-lg font-semibold text-naib-navy mb-4" style={{ fontFamily: "var(--font-dm-sans)" }}>
+    <div className="bg-card border border-border p-5">
+      <h2 className="text-xs font-semibold text-foreground mb-4 uppercase tracking-wider" style={{ fontFamily: "var(--font-dm-sans)" }}>
         Predictions
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {cards.map((card) => (
-          <div key={card.label} className="border border-gray-200 rounded-lg p-4">
+          <div key={card.label} className="border border-border p-3">
             <div className="flex items-center gap-2 mb-2">
-              <card.icon className="w-4 h-4" style={{ color: card.color }} />
-              <span className="text-xs font-medium text-naib-slate uppercase tracking-wider">{card.label}</span>
+              <card.icon className="w-3.5 h-3.5" style={{ color: card.color }} />
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{card.label}</span>
             </div>
-            <p className="text-lg font-bold" style={{ color: card.color }}>{card.value}</p>
+            <p className="text-sm font-bold font-mono" style={{ color: card.color }}>{card.value}</p>
             {card.detail && (
-              <p className="text-xs text-naib-slate mt-1 line-clamp-2">{card.detail}</p>
+              <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2 font-mono">{card.detail}</p>
             )}
           </div>
         ))}
