@@ -82,3 +82,19 @@ export function determineStatus(
   if (hasWarningFlag) return "REVIEW_REQUIRED";
   return "RECOMMENDED";
 }
+
+export function getCutlineFailures(
+  subtestResults: SubtestScore[],
+  cutline: CutlineData
+): { name: string; actual: number; required: number }[] {
+  const failures: { name: string; actual: number; required: number }[] = [];
+  const techAvg = avgPercentile(subtestResults, "TECHNICAL_APTITUDE");
+  const behAvg = avgPercentile(subtestResults, "BEHAVIORAL_INTEGRITY");
+  const lv = subtestResults.find(r => r.construct === "LEARNING_VELOCITY")?.percentile ?? 0;
+
+  if (techAvg < cutline.technicalAptitude) failures.push({ name: "Technical Aptitude", actual: techAvg, required: cutline.technicalAptitude });
+  if (behAvg < cutline.behavioralIntegrity) failures.push({ name: "Behavioral Integrity", actual: behAvg, required: cutline.behavioralIntegrity });
+  if (lv < cutline.learningVelocity) failures.push({ name: "Learning Velocity", actual: lv, required: cutline.learningVelocity });
+
+  return failures;
+}

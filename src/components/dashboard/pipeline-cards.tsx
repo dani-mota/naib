@@ -25,7 +25,7 @@ export function PipelineCards({ roles }: PipelineCardsProps) {
         return (
           <Link
             key={role.slug}
-            href={`/roles?role=${role.slug}`}
+            href={`/roles/${role.slug}`}
             className="bg-card border border-border p-4 hover:border-naib-gold/30 transition-all group"
           >
             <div className="flex items-center justify-between mb-3">

@@ -1,0 +1,43 @@
+"use client";
+
+import Link from "next/link";
+import { Grid3X3 } from "lucide-react";
+
+interface RoleTabSelectorProps {
+  roles: { slug: string; name: string }[];
+  currentSlug: string;
+}
+
+export function RoleTabSelector({ roles, currentSlug }: RoleTabSelectorProps) {
+  return (
+    <div className="bg-card border border-border">
+      <div className="flex items-center justify-between">
+        <div className="flex">
+          {roles.map((role) => {
+            const isActive = role.slug === currentSlug;
+            return (
+              <Link
+                key={role.slug}
+                href={`/roles/${role.slug}`}
+                className={`px-4 py-3 text-[11px] font-medium uppercase tracking-wider transition-colors border-b-2 ${
+                  isActive
+                    ? "text-naib-gold border-naib-gold bg-naib-gold/5"
+                    : "text-muted-foreground border-transparent hover:text-foreground hover:bg-accent/50"
+                }`}
+              >
+                {role.name}
+              </Link>
+            );
+          })}
+        </div>
+        <Link
+          href="/roles"
+          className="flex items-center gap-1.5 px-4 py-3 text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Grid3X3 className="w-3.5 h-3.5" />
+          Matrix View
+        </Link>
+      </div>
+    </div>
+  );
+}
