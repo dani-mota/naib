@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  ResponsiveContainer, Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import { CONSTRUCTS, LAYER_INFO, type LayerType } from "@/lib/constructs";
 
@@ -14,7 +14,15 @@ interface SpiderChartProps {
   roleSlug?: string;
 }
 
-export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderChartProps) {
+function getBenchmark(constructKey: string, layer: LayerType, cutline: any): number {
+  if (!cutline) return 0;
+  if (constructKey === "LEARNING_VELOCITY") return cutline.learningVelocity ?? 0;
+  if (layer === "TECHNICAL_APTITUDE") return cutline.technicalAptitude ?? 0;
+  if (layer === "BEHAVIORAL_INTEGRITY") return cutline.behavioralIntegrity ?? 0;
+  return cutline.overallMinimum ?? 30;
+}
+
+export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: SpiderChartProps) {
   const [viewType, setViewType] = useState<"radar" | "bar">("radar");
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
   const [labelPos, setLabelPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -24,6 +32,7 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
     const weight = roleWeights.find((w: any) => w.constructId === key);
     const layer = meta.layer as LayerType;
     const percentile = result?.percentile ?? 0;
+    const benchmark = getBenchmark(key, layer, cutline);
 
     return {
       key,
@@ -32,7 +41,7 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
       definition: meta.definition,
       roleRelevance: roleSlug ? meta.roleRelevance[roleSlug] : undefined,
       percentile,
-      average: 50,
+      benchmark,
       weight: weight?.weight ?? 0,
       layer,
       layerColor: LAYER_INFO[layer].color,
@@ -41,7 +50,7 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
 
   const hoveredData = hoveredLabel ? data.find((d) => d.construct === hoveredLabel) : null;
 
-  // Custom dot renderer — colors each dot by its layer
+  // Custom dot — only for candidate score, colored by layer
   const CustomDot = useCallback((props: any) => {
     const { cx, cy, payload } = props;
     if (!payload) return null;
@@ -57,7 +66,7 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
     );
   }, []);
 
-  // Axis labels colored by layer, interactive for hover tooltip
+  // Axis labels colored by layer, hover triggers tooltip
   const CustomTick = useCallback((props: any) => {
     const { x, y, payload } = props;
     const d = data.find((item) => item.construct === payload.value);
@@ -90,45 +99,48 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  // Rich tooltip for data point hover
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (!active || !payload?.length) return null;
-    const d = payload[0]?.payload;
-    if (!d) return null;
+  // Custom grid: concentric circles (neutral) + radial lines colored by layer
+  const CustomPolarGrid = useCallback((props: any) => {
+    const { cx, cy, outerRadius } = props;
+    if (!cx || !cy || !outerRadius) return null;
+
+    const count = data.length;
+    const concentricRadii = [0.2, 0.4, 0.6, 0.8, 1.0];
 
     return (
-      <div
-        className="bg-card/95 backdrop-blur-sm p-4 shadow-xl border border-border max-w-[280px]"
-        style={{ pointerEvents: "none", animation: "spiderFadeIn 150ms ease-out" }}
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-2 h-2" style={{ backgroundColor: d.layerColor }} />
-          <p className="font-semibold text-xs text-foreground uppercase tracking-wider">{d.fullName}</p>
-        </div>
-
-        <p className="text-lg font-bold font-mono mb-2" style={{ color: d.layerColor }}>
-          {d.percentile}<span className="text-[10px] font-normal text-muted-foreground ml-0.5">th percentile</span>
-        </p>
-
-        <p className="text-[10px] text-muted-foreground leading-relaxed mb-2">
-          {d.definition}
-        </p>
-
-        {d.roleRelevance && (
-          <div className="pt-2 border-t border-border">
-            <p className="text-[9px] text-naib-gold uppercase tracking-wider font-medium mb-1">Why This Matters</p>
-            <p className="text-[10px] text-muted-foreground leading-relaxed">{d.roleRelevance}</p>
-          </div>
-        )}
-
-        {d.weight > 0 && (
-          <p className="text-[9px] text-muted-foreground mt-2 font-mono uppercase tracking-wider">
-            Role weight: {d.weight}%
-          </p>
-        )}
-      </div>
+      <g>
+        {concentricRadii.map((ratio) => (
+          <circle
+            key={ratio}
+            cx={cx}
+            cy={cy}
+            r={outerRadius * ratio}
+            fill="none"
+            stroke="var(--border)"
+            strokeWidth={1}
+          />
+        ))}
+        {data.map((d, i) => {
+          const angle = (Math.PI * 2 * i) / count - Math.PI / 2;
+          const x2 = cx + outerRadius * Math.cos(angle);
+          const y2 = cy + outerRadius * Math.sin(angle);
+          return (
+            <line
+              key={d.key}
+              x1={cx}
+              y1={cy}
+              x2={x2}
+              y2={y2}
+              stroke={d.layerColor}
+              strokeWidth={1}
+              strokeOpacity={0.3}
+            />
+          );
+        })}
+      </g>
     );
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   return (
     <div className="bg-card border border-border p-5 relative">
@@ -162,7 +174,8 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
         <div className="h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="72%" data={data}>
-              <PolarGrid stroke="var(--border)" />
+              <PolarGrid gridType="circle" stroke="var(--border)" radialLines={false} />
+              <CustomPolarGrid cx={0} cy={0} outerRadius={0} />
               <PolarAngleAxis
                 dataKey="construct"
                 tick={<CustomTick />}
@@ -173,16 +186,18 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
                 tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
                 tickCount={5}
               />
-              {/* Dashed 50th percentile reference */}
+              {/* Role benchmark — dashed, no dots */}
               <Radar
-                name="Average"
-                dataKey="average"
+                name="Benchmark"
+                dataKey="benchmark"
                 stroke="var(--muted-foreground)"
                 strokeDasharray="4 4"
                 fill="none"
                 strokeWidth={1}
+                dot={false}
+                isAnimationActive={false}
               />
-              {/* Single continuous filled polygon */}
+              {/* Candidate score — filled polygon with layer-colored dots */}
               <Radar
                 name="Score"
                 dataKey="percentile"
@@ -193,7 +208,7 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
                 strokeWidth={1.5}
                 dot={<CustomDot />}
               />
-              <Tooltip content={<CustomTooltip />} />
+              {/* No <Tooltip> — popup only on axis label hover */}
             </RadarChart>
           </ResponsiveContainer>
         </div>
@@ -211,7 +226,11 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
                     opacity: 0.8,
                   }}
                 />
-                <div className="absolute top-0 bottom-0 left-[50%] w-px bg-muted-foreground/30" />
+                {/* Benchmark marker */}
+                <div
+                  className="absolute top-0 bottom-0 w-px bg-muted-foreground/50"
+                  style={{ left: `${d.benchmark}%` }}
+                />
               </div>
               <span className="w-8 text-[10px] font-mono font-medium tabular-nums text-right" style={{ color: d.layerColor }}>
                 {d.percentile}
@@ -221,7 +240,7 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
         </div>
       )}
 
-      {/* Axis label hover tooltip — rendered as a portal-like fixed div */}
+      {/* Tooltip — only appears when hovering axis labels (FL, EC, etc.) */}
       {hoveredData && (
         <div
           className="fixed z-50 bg-card/95 backdrop-blur-sm p-4 shadow-xl border border-border max-w-[280px]"
@@ -236,8 +255,15 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
             <div className="w-2 h-2" style={{ backgroundColor: hoveredData.layerColor }} />
             <p className="font-semibold text-xs text-foreground uppercase tracking-wider">{hoveredData.fullName}</p>
           </div>
-          <p className="text-lg font-bold font-mono mb-2" style={{ color: hoveredData.layerColor }}>
+          <p className="text-lg font-bold font-mono mb-1" style={{ color: hoveredData.layerColor }}>
             {hoveredData.percentile}<span className="text-[10px] font-normal text-muted-foreground ml-0.5">th percentile</span>
+          </p>
+          <p className="text-[10px] text-muted-foreground font-mono mb-2">
+            Benchmark: {hoveredData.benchmark}th
+            {hoveredData.percentile >= hoveredData.benchmark
+              ? <span className="text-naib-green ml-1">(+{hoveredData.percentile - hoveredData.benchmark} above)</span>
+              : <span className="text-naib-red ml-1">({hoveredData.percentile - hoveredData.benchmark} below)</span>
+            }
           </p>
           <p className="text-[10px] text-muted-foreground leading-relaxed mb-2">{hoveredData.definition}</p>
           {hoveredData.roleRelevance && (
@@ -249,7 +275,7 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
         </div>
       )}
 
-      {/* Layer legend */}
+      {/* Legend */}
       <div className="flex justify-center gap-5 mt-4 pt-3 border-t border-border">
         {Object.entries(LAYER_INFO).map(([key, info]) => (
           <div key={key} className="flex items-center gap-1.5">
@@ -257,6 +283,10 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
             <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{info.name}</span>
           </div>
         ))}
+        <div className="flex items-center gap-1.5">
+          <div className="w-4 h-0 border-t border-dashed border-muted-foreground" />
+          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Role Benchmark</span>
+        </div>
       </div>
     </div>
   );
