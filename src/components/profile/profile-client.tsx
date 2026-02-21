@@ -66,6 +66,7 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
             subtestResults={candidate.assessment?.subtestResults || []}
             roleWeights={selectedRole?.compositeWeights || []}
             cutline={cutline}
+            roleSlug={selectedRoleSlug}
           />
 
           <IntelligenceReport

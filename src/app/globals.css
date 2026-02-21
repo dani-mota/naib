@@ -158,3 +158,22 @@
     font-family: var(--font-display);
   }
 }
+
+/* ── Recharts focus/outline suppression ── */
+.recharts-wrapper,
+.recharts-wrapper:focus,
+.recharts-wrapper:focus-visible,
+.recharts-surface,
+.recharts-surface:focus,
+.recharts-surface:focus-visible,
+.recharts-wrapper svg,
+.recharts-wrapper svg:focus,
+.recharts-wrapper svg:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.recharts-wrapper *:focus,
+.recharts-wrapper *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

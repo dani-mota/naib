@@ -11,36 +11,91 @@ interface SpiderChartProps {
   subtestResults: any[];
   roleWeights: any[];
   cutline?: any;
+  roleSlug?: string;
 }
 
-export function SpiderChart({ subtestResults, roleWeights }: SpiderChartProps) {
+export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderChartProps) {
   const [viewType, setViewType] = useState<"radar" | "bar">("radar");
 
   const data = Object.entries(CONSTRUCTS).map(([key, meta]) => {
     const result = subtestResults.find((r: any) => r.construct === key);
     const weight = roleWeights.find((w: any) => w.constructId === key);
+    const layer = meta.layer as LayerType;
+    const percentile = result?.percentile ?? 0;
+
     return {
       construct: meta.abbreviation,
       fullName: meta.name,
-      percentile: result?.percentile ?? 0,
+      definition: meta.definition,
+      roleRelevance: roleSlug ? meta.roleRelevance[roleSlug] : undefined,
+      percentile,
+      cognitive: layer === "COGNITIVE_CORE" ? percentile : 0,
+      technical: layer === "TECHNICAL_APTITUDE" ? percentile : 0,
+      behavioral: layer === "BEHAVIORAL_INTEGRITY" ? percentile : 0,
       average: 50,
       weight: weight?.weight ?? 0,
-      layer: meta.layer,
-      layerColor: LAYER_INFO[meta.layer as LayerType].color,
+      layer,
+      layerColor: LAYER_INFO[layer].color,
     };
   });
 
+  // Color each axis label by its layer
+  const CustomTick = (props: any) => {
+    const { x, y, payload } = props;
+    const d = data.find((item) => item.construct === payload.value);
+    const color = d?.layerColor ?? "var(--muted-foreground)";
+
+    return (
+      <text
+        x={x}
+        y={y}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill={color}
+        fontSize={10}
+        fontWeight={600}
+        style={{ fontFamily: "var(--font-mono, monospace)" }}
+      >
+        {payload.value}
+      </text>
+    );
+  };
+
+  // Rich tooltip with definition + role relevance
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
-    const d = payload[0].payload;
+    const d = payload[0]?.payload;
+    if (!d) return null;
+
     return (
-      <div className="bg-card p-3 shadow-lg border border-border max-w-xs">
-        <p className="font-semibold text-xs text-foreground">{d.fullName}</p>
-        <p className="text-sm font-bold font-mono" style={{ color: d.layerColor }}>
-          {d.percentile}th percentile
+      <div
+        className="bg-card/95 backdrop-blur-sm p-4 shadow-xl border border-border max-w-[280px]"
+        style={{ pointerEvents: "none", animation: "spiderFadeIn 150ms ease-out" }}
+      >
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-2 h-2" style={{ backgroundColor: d.layerColor }} />
+          <p className="font-semibold text-xs text-foreground uppercase tracking-wider">{d.fullName}</p>
+        </div>
+
+        <p className="text-lg font-bold font-mono mb-2" style={{ color: d.layerColor }}>
+          {d.percentile}<span className="text-[10px] font-normal text-muted-foreground ml-0.5">th percentile</span>
         </p>
+
+        <p className="text-[10px] text-muted-foreground leading-relaxed mb-2">
+          {d.definition}
+        </p>
+
+        {d.roleRelevance && (
+          <div className="pt-2 border-t border-border">
+            <p className="text-[9px] text-naib-gold uppercase tracking-wider font-medium mb-1">Why This Matters</p>
+            <p className="text-[10px] text-muted-foreground leading-relaxed">{d.roleRelevance}</p>
+          </div>
+        )}
+
         {d.weight > 0 && (
-          <p className="text-[10px] text-muted-foreground mt-1 font-mono">Role weight: {d.weight}%</p>
+          <p className="text-[9px] text-muted-foreground mt-2 font-mono uppercase tracking-wider">
+            Role weight: {d.weight}%
+          </p>
         )}
       </div>
     );
@@ -48,6 +103,8 @@ export function SpiderChart({ subtestResults, roleWeights }: SpiderChartProps) {
 
   return (
     <div className="bg-card border border-border p-5">
+      <style>{`@keyframes spiderFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider" style={{ fontFamily: "var(--font-dm-sans)" }}>
           Construct Profile
@@ -79,7 +136,7 @@ export function SpiderChart({ subtestResults, roleWeights }: SpiderChartProps) {
               <PolarGrid stroke="var(--border)" />
               <PolarAngleAxis
                 dataKey="construct"
-                tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
+                tick={<CustomTick />}
               />
               <PolarRadiusAxis
                 angle={90}
@@ -87,6 +144,7 @@ export function SpiderChart({ subtestResults, roleWeights }: SpiderChartProps) {
                 tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
                 tickCount={5}
               />
+              {/* Dashed 50th percentile reference */}
               <Radar
                 name="Average"
                 dataKey="average"
@@ -95,14 +153,35 @@ export function SpiderChart({ subtestResults, roleWeights }: SpiderChartProps) {
                 fill="none"
                 strokeWidth={1}
               />
+              {/* Cognitive Core — blue */}
               <Radar
-                name="Score"
-                dataKey="percentile"
-                stroke="#2563EB"
-                fill="#2563EB"
-                fillOpacity={0.12}
+                name="Cognitive Core"
+                dataKey="cognitive"
+                stroke={LAYER_INFO.COGNITIVE_CORE.color}
+                fill={LAYER_INFO.COGNITIVE_CORE.color}
+                fillOpacity={0.08}
                 strokeWidth={2}
-                dot={{ fill: "#2563EB", r: 3 }}
+                dot={{ fill: LAYER_INFO.COGNITIVE_CORE.color, r: 3, strokeWidth: 0 }}
+              />
+              {/* Technical Aptitude — green */}
+              <Radar
+                name="Technical Aptitude"
+                dataKey="technical"
+                stroke={LAYER_INFO.TECHNICAL_APTITUDE.color}
+                fill={LAYER_INFO.TECHNICAL_APTITUDE.color}
+                fillOpacity={0.08}
+                strokeWidth={2}
+                dot={{ fill: LAYER_INFO.TECHNICAL_APTITUDE.color, r: 3, strokeWidth: 0 }}
+              />
+              {/* Behavioral Integrity — orange */}
+              <Radar
+                name="Behavioral Integrity"
+                dataKey="behavioral"
+                stroke={LAYER_INFO.BEHAVIORAL_INTEGRITY.color}
+                fill={LAYER_INFO.BEHAVIORAL_INTEGRITY.color}
+                fillOpacity={0.08}
+                strokeWidth={2}
+                dot={{ fill: LAYER_INFO.BEHAVIORAL_INTEGRITY.color, r: 3, strokeWidth: 0 }}
               />
               <Tooltip content={<CustomTooltip />} />
             </RadarChart>
@@ -132,6 +211,7 @@ export function SpiderChart({ subtestResults, roleWeights }: SpiderChartProps) {
         </div>
       )}
 
+      {/* Layer legend */}
       <div className="flex justify-center gap-5 mt-4 pt-3 border-t border-border">
         {Object.entries(LAYER_INFO).map(([key, info]) => (
           <div key={key} className="flex items-center gap-1.5">
