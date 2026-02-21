@@ -1,0 +1,297 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──────────────────────────────────────────────
+// ORGANIZATION & USERS
+// ──────────────────────────────────────────────
+
+model Organization {
+  id         String      @id @default(cuid())
+  name       String
+  createdAt  DateTime    @default(now())
+  users      User[]
+  candidates Candidate[]
+  roles      Role[]
+  cutlines   Cutline[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id])
+  notes     Note[]
+  createdAt DateTime @default(now())
+}
+
+enum UserRole {
+  RECRUITER_COORDINATOR
+  RECRUITING_MANAGER
+  HIRING_MANAGER
+  TA_LEADER
+  ADMIN
+}
+
+// ──────────────────────────────────────────────
+// ROLES & CUTLINES
+// ──────────────────────────────────────────────
+
+model Role {
+  id               String            @id @default(cuid())
+  name             String
+  slug             String            @unique
+  description      String?
+  orgId            String
+  org              Organization      @relation(fields: [orgId], references: [id])
+  cutlines         Cutline[]
+  compositeWeights CompositeWeight[]
+  candidates       Candidate[]
+  createdAt        DateTime          @default(now())
+}
+
+model Cutline {
+  id                  String       @id @default(cuid())
+  roleId              String
+  role                Role         @relation(fields: [roleId], references: [id])
+  orgId               String
+  org                 Organization @relation(fields: [orgId], references: [id])
+  technicalAptitude   Int
+  behavioralIntegrity Int
+  learningVelocity    Int
+  overallMinimum      Int?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@unique([roleId, orgId])
+}
+
+model CompositeWeight {
+  id          String   @id @default(cuid())
+  roleId      String
+  role        Role     @relation(fields: [roleId], references: [id])
+  constructId String
+  weight      Float
+  createdAt   DateTime @default(now())
+
+  @@unique([roleId, constructId])
+}
+
+// ──────────────────────────────────────────────
+// CANDIDATES & ASSESSMENTS
+// ──────────────────────────────────────────────
+
+model Candidate {
+  id            String          @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String
+  phone         String?
+  orgId         String
+  org           Organization    @relation(fields: [orgId], references: [id])
+  primaryRoleId String
+  primaryRole   Role            @relation(fields: [primaryRoleId], references: [id])
+  status        CandidateStatus @default(INCOMPLETE)
+  assessment    Assessment?
+  notes         Note[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+enum CandidateStatus {
+  INCOMPLETE
+  SCORING
+  RECOMMENDED
+  REVIEW_REQUIRED
+  DO_NOT_ADVANCE
+}
+
+model Assessment {
+  id              String           @id @default(cuid())
+  candidateId     String           @unique
+  candidate       Candidate        @relation(fields: [candidateId], references: [id])
+  startedAt       DateTime
+  completedAt     DateTime?
+  durationMinutes Int?
+  subtestResults  SubtestResult[]
+  compositeScores CompositeScore[]
+  predictions     Prediction?
+  redFlags        RedFlag[]
+  aiInteractions  AIInteraction[]
+  createdAt       DateTime         @default(now())
+}
+
+// ──────────────────────────────────────────────
+// CONSTRUCT SCORES
+// ──────────────────────────────────────────────
+
+model SubtestResult {
+  id                String     @id @default(cuid())
+  assessmentId      String
+  assessment        Assessment @relation(fields: [assessmentId], references: [id])
+  construct         Construct
+  layer             Layer
+  rawScore          Float
+  percentile        Int
+  theta             Float?
+  standardError     Float?
+  responseTimeAvgMs Int?
+  itemCount         Int
+  aiFollowUpCount   Int        @default(0)
+  calibrationScore  Float?
+  calibrationBias   String?
+  narrativeInsight  String?
+  createdAt         DateTime   @default(now())
+
+  @@unique([assessmentId, construct])
+}
+
+enum Layer {
+  COGNITIVE_CORE
+  TECHNICAL_APTITUDE
+  BEHAVIORAL_INTEGRITY
+}
+
+enum Construct {
+  FLUID_REASONING
+  EXECUTIVE_CONTROL
+  COGNITIVE_FLEXIBILITY
+  METACOGNITIVE_CALIBRATION
+  LEARNING_VELOCITY
+  SYSTEMS_DIAGNOSTICS
+  PATTERN_RECOGNITION
+  QUANTITATIVE_REASONING
+  SPATIAL_VISUALIZATION
+  MECHANICAL_REASONING
+  PROCEDURAL_RELIABILITY
+  ETHICAL_JUDGMENT
+}
+
+model CompositeScore {
+  id                  String     @id @default(cuid())
+  assessmentId        String
+  assessment          Assessment @relation(fields: [assessmentId], references: [id])
+  roleSlug            String
+  indexName            String
+  score               Float
+  percentile          Int
+  passed              Boolean
+  distanceFromCutline Float
+  createdAt           DateTime   @default(now())
+
+  @@unique([assessmentId, roleSlug])
+}
+
+// ──────────────────────────────────────────────
+// AI-ADAPTIVE INTERACTIONS
+// ──────────────────────────────────────────────
+
+model AIInteraction {
+  id                String     @id @default(cuid())
+  assessmentId      String
+  assessment        Assessment @relation(fields: [assessmentId], references: [id])
+  construct         Construct
+  sequenceOrder     Int
+  triggerItemId     String?
+  triggerResponse   String?
+  aiPrompt          String
+  candidateResponse String?
+  responseTimeMs    Int?
+  aiAnalysis        String?
+  evidenceFor       Json?
+  confidenceLevel   Float?
+  createdAt         DateTime   @default(now())
+
+  @@index([assessmentId, construct])
+}
+
+// ──────────────────────────────────────────────
+// PREDICTIONS & FLAGS
+// ──────────────────────────────────────────────
+
+model Prediction {
+  id                  String           @id @default(cuid())
+  assessmentId        String           @unique
+  assessment          Assessment       @relation(fields: [assessmentId], references: [id])
+  rampTimeMonths      Float
+  rampTimeLabel       String
+  rampTimeFactors     Json
+  supervisionLoad     SupervisionLevel
+  supervisionScore    Int
+  supervisionFactors  Json
+  performanceCeiling  CeilingLevel
+  ceilingFactors      Json
+  ceilingCareerPath   Json
+  attritionRisk       RiskLevel
+  attritionFactors    Json
+  attritionStrategies Json
+  createdAt           DateTime         @default(now())
+}
+
+enum SupervisionLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum CeilingLevel {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model RedFlag {
+  id           String       @id @default(cuid())
+  assessmentId String
+  assessment   Assessment   @relation(fields: [assessmentId], references: [id])
+  severity     FlagSeverity
+  category     String
+  title        String
+  description  String
+  constructs   String[]
+  createdAt    DateTime     @default(now())
+}
+
+enum FlagSeverity {
+  CRITICAL
+  WARNING
+  INFO
+}
+
+// ──────────────────────────────────────────────
+// NOTES & AUDIT
+// ──────────────────────────────────────────────
+
+model Note {
+  id          String    @id @default(cuid())
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  content     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  action     String
+  actorId    String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+}
