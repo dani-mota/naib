@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight, ClipboardCheck, Compass, Wrench, Users, Lightbulb, Rocket } from "lucide-react";
+import { ChevronDown, ChevronRight, ClipboardCheck, Compass, Wrench, Users, Lightbulb, Rocket, AlertTriangle, CheckCircle, Info } from "lucide-react";
 import { generateAllPanels } from "@/lib/intelligence";
 
 const ICONS: Record<string, any> = {
@@ -11,6 +11,12 @@ const ICONS: Record<string, any> = {
   "users": Users,
   "lightbulb": Lightbulb,
   "rocket": Rocket,
+};
+
+const RISK_CONFIG = {
+  low: { label: "LOW RISK", color: "text-naib-green", bg: "bg-naib-green/5", border: "border-naib-green/20", Icon: CheckCircle },
+  moderate: { label: "MODERATE", color: "text-naib-amber", bg: "bg-naib-amber/5", border: "border-naib-amber/20", Icon: Info },
+  elevated: { label: "ELEVATED", color: "text-naib-red", bg: "bg-naib-red/5", border: "border-naib-red/20", Icon: AlertTriangle },
 };
 
 interface IntelligenceReportProps {
@@ -43,6 +49,7 @@ export function IntelligenceReport({ subtestResults, roleName }: IntelligenceRep
         {panels.map((panel, i) => {
           const isOpen = openPanels.has(i);
           const Icon = ICONS[panel.icon] || ClipboardCheck;
+          const risk = panel.riskLevel ? RISK_CONFIG[panel.riskLevel] : null;
 
           return (
             <div key={i} className="border border-border overflow-hidden">
@@ -52,6 +59,11 @@ export function IntelligenceReport({ subtestResults, roleName }: IntelligenceRep
               >
                 <Icon className="w-4 h-4 text-naib-blue shrink-0" />
                 <span className="flex-1 text-xs font-medium text-foreground">{panel.title}</span>
+                {risk && (
+                  <span className={`text-[9px] font-mono font-medium uppercase tracking-wider ${risk.color} px-1.5 py-0.5 ${risk.bg} border ${risk.border}`}>
+                    {risk.label}
+                  </span>
+                )}
                 {isOpen ? (
                   <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
                 ) : (
@@ -64,8 +76,9 @@ export function IntelligenceReport({ subtestResults, roleName }: IntelligenceRep
                   <p className="text-xs text-muted-foreground leading-relaxed mt-2.5">
                     {panel.narrative}
                   </p>
+
                   {panel.keyPoints.length > 0 && (
-                    <ul className="mt-2 space-y-1">
+                    <ul className="mt-3 space-y-1.5">
                       {panel.keyPoints.map((point, j) => (
                         <li key={j} className="flex items-start gap-2 text-[11px] text-muted-foreground">
                           <span className="w-1 h-1 bg-naib-gold mt-1.5 shrink-0" />
@@ -73,6 +86,24 @@ export function IntelligenceReport({ subtestResults, roleName }: IntelligenceRep
                         </li>
                       ))}
                     </ul>
+                  )}
+
+                  {/* Hiring Action + Development Note */}
+                  {(panel.hiringAction || panel.developmentNote) && (
+                    <div className="mt-3 pt-3 border-t border-border grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {panel.hiringAction && (
+                        <div className="p-2 bg-accent/30">
+                          <p className="text-[9px] text-naib-gold uppercase tracking-wider font-medium mb-1">Hiring Action</p>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed">{panel.hiringAction}</p>
+                        </div>
+                      )}
+                      {panel.developmentNote && (
+                        <div className="p-2 bg-accent/30">
+                          <p className="text-[9px] text-naib-blue uppercase tracking-wider font-medium mb-1">Development Focus</p>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed">{panel.developmentNote}</p>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               )}

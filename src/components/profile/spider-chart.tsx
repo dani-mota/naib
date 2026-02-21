@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ResponsiveContainer, Tooltip,
@@ -16,6 +16,8 @@ interface SpiderChartProps {
 
 export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderChartProps) {
   const [viewType, setViewType] = useState<"radar" | "bar">("radar");
+  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
+  const [labelPos, setLabelPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const data = Object.entries(CONSTRUCTS).map(([key, meta]) => {
     const result = subtestResults.find((r: any) => r.construct === key);
@@ -24,14 +26,12 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
     const percentile = result?.percentile ?? 0;
 
     return {
+      key,
       construct: meta.abbreviation,
       fullName: meta.name,
       definition: meta.definition,
       roleRelevance: roleSlug ? meta.roleRelevance[roleSlug] : undefined,
       percentile,
-      cognitive: layer === "COGNITIVE_CORE" ? percentile : 0,
-      technical: layer === "TECHNICAL_APTITUDE" ? percentile : 0,
-      behavioral: layer === "BEHAVIORAL_INTEGRITY" ? percentile : 0,
       average: 50,
       weight: weight?.weight ?? 0,
       layer,
@@ -39,29 +39,58 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
     };
   });
 
-  // Color each axis label by its layer
-  const CustomTick = (props: any) => {
+  const hoveredData = hoveredLabel ? data.find((d) => d.construct === hoveredLabel) : null;
+
+  // Custom dot renderer — colors each dot by its layer
+  const CustomDot = useCallback((props: any) => {
+    const { cx, cy, payload } = props;
+    if (!payload) return null;
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={4}
+        fill={payload.layerColor}
+        stroke="var(--card)"
+        strokeWidth={2}
+      />
+    );
+  }, []);
+
+  // Axis labels colored by layer, interactive for hover tooltip
+  const CustomTick = useCallback((props: any) => {
     const { x, y, payload } = props;
     const d = data.find((item) => item.construct === payload.value);
     const color = d?.layerColor ?? "var(--muted-foreground)";
 
     return (
-      <text
-        x={x}
-        y={y}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fill={color}
-        fontSize={10}
-        fontWeight={600}
-        style={{ fontFamily: "var(--font-mono, monospace)" }}
+      <g
+        onMouseEnter={(e) => {
+          setHoveredLabel(payload.value);
+          setLabelPos({ x: e.clientX, y: e.clientY });
+        }}
+        onMouseLeave={() => setHoveredLabel(null)}
+        style={{ cursor: "pointer" }}
       >
-        {payload.value}
-      </text>
+        <circle cx={x} cy={y} r={12} fill="transparent" />
+        <text
+          x={x}
+          y={y}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill={color}
+          fontSize={11}
+          fontWeight={700}
+          style={{ fontFamily: "var(--font-mono, monospace)" }}
+        >
+          {payload.value}
+        </text>
+      </g>
     );
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
-  // Rich tooltip with definition + role relevance
+  // Rich tooltip for data point hover
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload?.length) return null;
     const d = payload[0]?.payload;
@@ -102,7 +131,7 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
   };
 
   return (
-    <div className="bg-card border border-border p-5">
+    <div className="bg-card border border-border p-5 relative">
       <style>{`@keyframes spiderFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
 
       <div className="flex items-center justify-between mb-4">
@@ -130,9 +159,9 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
       </div>
 
       {viewType === "radar" ? (
-        <div className="h-[380px]">
+        <div className="h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart cx="50%" cy="50%" outerRadius="75%" data={data}>
+            <RadarChart cx="50%" cy="50%" outerRadius="72%" data={data}>
               <PolarGrid stroke="var(--border)" />
               <PolarAngleAxis
                 dataKey="construct"
@@ -153,35 +182,16 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
                 fill="none"
                 strokeWidth={1}
               />
-              {/* Cognitive Core — blue */}
+              {/* Single continuous filled polygon */}
               <Radar
-                name="Cognitive Core"
-                dataKey="cognitive"
-                stroke={LAYER_INFO.COGNITIVE_CORE.color}
-                fill={LAYER_INFO.COGNITIVE_CORE.color}
-                fillOpacity={0.08}
-                strokeWidth={2}
-                dot={{ fill: LAYER_INFO.COGNITIVE_CORE.color, r: 3, strokeWidth: 0 }}
-              />
-              {/* Technical Aptitude — green */}
-              <Radar
-                name="Technical Aptitude"
-                dataKey="technical"
-                stroke={LAYER_INFO.TECHNICAL_APTITUDE.color}
-                fill={LAYER_INFO.TECHNICAL_APTITUDE.color}
-                fillOpacity={0.08}
-                strokeWidth={2}
-                dot={{ fill: LAYER_INFO.TECHNICAL_APTITUDE.color, r: 3, strokeWidth: 0 }}
-              />
-              {/* Behavioral Integrity — orange */}
-              <Radar
-                name="Behavioral Integrity"
-                dataKey="behavioral"
-                stroke={LAYER_INFO.BEHAVIORAL_INTEGRITY.color}
-                fill={LAYER_INFO.BEHAVIORAL_INTEGRITY.color}
-                fillOpacity={0.08}
-                strokeWidth={2}
-                dot={{ fill: LAYER_INFO.BEHAVIORAL_INTEGRITY.color, r: 3, strokeWidth: 0 }}
+                name="Score"
+                dataKey="percentile"
+                stroke="var(--muted-foreground)"
+                strokeOpacity={0.4}
+                fill="var(--muted-foreground)"
+                fillOpacity={0.06}
+                strokeWidth={1.5}
+                dot={<CustomDot />}
               />
               <Tooltip content={<CustomTooltip />} />
             </RadarChart>
@@ -191,7 +201,7 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
         <div className="space-y-1.5">
           {data.map((d) => (
             <div key={d.construct} className="flex items-center gap-3">
-              <span className="w-7 text-[10px] font-mono font-medium text-muted-foreground text-right">{d.construct}</span>
+              <span className="w-7 text-[10px] font-mono font-medium text-right" style={{ color: d.layerColor }}>{d.construct}</span>
               <div className="flex-1 h-5 bg-muted overflow-hidden relative">
                 <div
                   className="h-full transition-all duration-500"
@@ -208,6 +218,34 @@ export function SpiderChart({ subtestResults, roleWeights, roleSlug }: SpiderCha
               </span>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Axis label hover tooltip — rendered as a portal-like fixed div */}
+      {hoveredData && (
+        <div
+          className="fixed z-50 bg-card/95 backdrop-blur-sm p-4 shadow-xl border border-border max-w-[280px]"
+          style={{
+            left: labelPos.x + 16,
+            top: labelPos.y - 12,
+            pointerEvents: "none",
+            animation: "spiderFadeIn 120ms ease-out",
+          }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-2 h-2" style={{ backgroundColor: hoveredData.layerColor }} />
+            <p className="font-semibold text-xs text-foreground uppercase tracking-wider">{hoveredData.fullName}</p>
+          </div>
+          <p className="text-lg font-bold font-mono mb-2" style={{ color: hoveredData.layerColor }}>
+            {hoveredData.percentile}<span className="text-[10px] font-normal text-muted-foreground ml-0.5">th percentile</span>
+          </p>
+          <p className="text-[10px] text-muted-foreground leading-relaxed mb-2">{hoveredData.definition}</p>
+          {hoveredData.roleRelevance && (
+            <div className="pt-2 border-t border-border">
+              <p className="text-[9px] text-naib-gold uppercase tracking-wider font-medium mb-1">Why This Matters</p>
+              <p className="text-[10px] text-muted-foreground leading-relaxed">{hoveredData.roleRelevance}</p>
+            </div>
+          )}
         </div>
       )}
 
