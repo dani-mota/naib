@@ -153,8 +153,8 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
               x2={x2}
               y2={y2}
               stroke={d.layerColor}
-              strokeWidth={1}
-              strokeOpacity={0.35}
+              strokeWidth={1.5}
+              strokeOpacity={0.7}
             />
           );
         })}
