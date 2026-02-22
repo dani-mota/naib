@@ -19,6 +19,21 @@ const CONSTRUCT_ORDER = Object.keys(CONSTRUCTS);
 
 type SortKey = "composite" | string; // "composite" or a construct key
 
+const CONSTRUCT_COPY: Record<string, string> = {
+  FLUID_REASONING: "Measures how quickly someone solves problems they have never encountered before.",
+  EXECUTIVE_CONTROL: "Measures the ability to stay focused and manage competing priorities under pressure.",
+  COGNITIVE_FLEXIBILITY: "Measures how easily someone shifts strategies when the current approach is not working.",
+  METACOGNITIVE_CALIBRATION: "Measures whether someone accurately knows what they know and what they don't.",
+  LEARNING_VELOCITY: "Measures how fast someone picks up new skills and becomes productive independently.",
+  SYSTEMS_DIAGNOSTICS: "Measures the ability to understand complex systems and isolate root causes of failures.",
+  PATTERN_RECOGNITION: "Measures the ability to spot meaningful trends and anomalies before they become problems.",
+  QUANTITATIVE_REASONING: "Measures precision with numbers, tolerances, and mathematical relationships.",
+  SPATIAL_VISUALIZATION: "Measures the ability to mentally rotate 3D objects and read complex technical drawings.",
+  MECHANICAL_REASONING: "Measures intuition for how physical systems, forces, and mechanisms behave.",
+  PROCEDURAL_RELIABILITY: "Measures consistency in following established procedures, especially when shortcuts are tempting.",
+  ETHICAL_JUDGMENT: "Measures whether someone reports problems honestly and makes the right call under pressure.",
+};
+
 export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapClientProps) {
   const router = useRouter();
   const tableRef = useRef<HTMLDivElement>(null);
@@ -27,9 +42,9 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
   const [sortKey, setSortKey] = useState<SortKey>("composite");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [hoveredCell, setHoveredCell] = useState<{ key: string; val: number; x: number; y: number } | null>(null);
+  const [hoveredHeader, setHoveredHeader] = useState<{ key: string; x: number; y: number } | null>(null);
 
   const selectedRole = roles.find((r: any) => r.slug === selectedRoleSlug);
-  const roleCutline = cutlines.find((c: any) => c.roleId === selectedRole?.id);
   const roleWeights = weights.filter((w: any) => w.roleId === selectedRole?.id);
 
   const highWeightConstructs = useMemo(() => {
@@ -149,6 +164,8 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
 
   return (
     <div className="p-6">
+      <style>{`@keyframes heatmapFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
@@ -203,7 +220,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
 
       {/* Heatmap */}
       <div ref={tableRef} className="bg-card border border-border overflow-x-auto relative">
-        <table className="w-full text-[9px]">
+        <table className="w-full text-[9px] border-collapse">
           <thead>
             <tr className="border-b border-border">
               <th className="sticky left-0 bg-card z-10 py-1.5 px-1.5 text-left font-medium text-muted-foreground w-7" />
@@ -211,7 +228,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                 Candidate
               </th>
               <th
-                className="py-1.5 px-1 text-center font-semibold text-foreground min-w-[38px] uppercase tracking-wider cursor-pointer hover:bg-accent/30 select-none"
+                className="py-1.5 px-0 text-center font-semibold text-foreground w-[34px] uppercase tracking-wider cursor-pointer hover:bg-accent/30 select-none"
                 onClick={() => handleSort("composite")}
               >
                 CI
@@ -225,9 +242,13 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                 return (
                   <th
                     key={key}
-                    className={`py-1.5 px-1 text-center font-medium min-w-[36px] cursor-pointer hover:bg-accent/30 select-none ${isHighWeight ? "border-l-2 border-l-naib-gold" : ""}`}
+                    className={`py-1.5 px-0 text-center font-medium w-[34px] cursor-pointer hover:bg-accent/30 select-none ${isHighWeight ? "border-l-2 border-l-naib-gold" : ""}`}
                     style={{ borderTop: `2px solid ${layerInfo.color}` }}
                     onClick={() => handleSort(key)}
+                    onMouseEnter={(e) => {
+                      setHoveredHeader({ key, x: e.clientX, y: e.clientY });
+                    }}
+                    onMouseLeave={() => setHoveredHeader(null)}
                   >
                     <span className="font-mono" style={{ color: layerInfo.color }}>{meta.abbreviation}</span>
                     <SortIndicator active={sortKey === key} dir={sortDir} />
@@ -237,70 +258,92 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, i) => (
-              <tr
-                key={row.id}
-                className={`border-b hover:bg-accent/30 transition-colors ${
-                  cutlineIndex === i ? "border-b-2 border-b-naib-red/50 border-dashed" : "border-border/50"
-                }`}
-              >
-                <td className="sticky left-0 bg-card py-0.5 px-1.5">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(row.id)}
-                    onChange={() => toggleSelect(row.id)}
-                    className="border-border w-3 h-3"
-                  />
-                </td>
-                <td className="sticky left-7 bg-card py-0.5 px-1.5">
-                  <Link
-                    href={`/candidates/${row.id}`}
-                    className="text-[10px] font-medium text-foreground hover:text-naib-gold transition-colors"
-                  >
-                    {row.name}
-                  </Link>
-                </td>
-                <td className="py-0.5 px-1 text-center">
-                  <span
-                    className="inline-flex items-center justify-center w-8 h-5 text-[9px] font-bold font-mono"
-                    style={{
-                      backgroundColor: getCellBg(row.composite),
-                      color: getCellColor(row.composite),
-                    }}
-                  >
-                    {row.composite}
+            {rows.map((row, i) => {
+              const isCutline = cutlineIndex === i;
+              return (
+                <tr
+                  key={row.id}
+                  className="hover:bg-accent/30 transition-colors"
+                  style={{
+                    borderBottom: isCutline
+                      ? "none"
+                      : "1px solid var(--border)",
+                  }}
+                >
+                  <td className="sticky left-0 bg-card py-0 px-1.5">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(row.id)}
+                      onChange={() => toggleSelect(row.id)}
+                      className="border-border w-3 h-3"
+                    />
+                  </td>
+                  <td className="sticky left-7 bg-card py-0 px-1.5">
+                    <Link
+                      href={`/candidates/${row.id}`}
+                      className="text-[10px] font-medium text-foreground hover:text-naib-gold transition-colors"
+                    >
+                      {row.name}
+                    </Link>
+                  </td>
+                  <td className="py-0 px-0 text-center">
+                    <span
+                      className="inline-flex items-center justify-center w-full h-[22px] text-[9px] font-bold font-mono"
+                      style={{
+                        backgroundColor: getCellBg(row.composite),
+                        color: getCellColor(row.composite),
+                      }}
+                    >
+                      {row.composite}
+                    </span>
+                  </td>
+                  {CONSTRUCT_ORDER.map((key) => {
+                    const val = row.scores[key] ?? 0;
+                    const isHighWeight = highWeightConstructs.has(key);
+                    return (
+                      <td
+                        key={key}
+                        className={`py-0 px-0 text-center ${isHighWeight ? "border-l-2 border-l-naib-gold/30" : ""}`}
+                        onMouseEnter={(e) => {
+                          setHoveredCell({ key, val, x: e.clientX, y: e.clientY });
+                        }}
+                        onMouseLeave={() => setHoveredCell(null)}
+                      >
+                        <span
+                          className="inline-flex items-center justify-center w-full h-[22px] text-[9px] font-medium font-mono"
+                          style={{
+                            backgroundColor: getCellBg(val),
+                            color: getCellColor(val),
+                          }}
+                        >
+                          {val}
+                        </span>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+
+            {/* Cutline separator row */}
+            {cutlineIndex >= 0 && cutlineIndex < rows.length && (
+              <tr>
+                <td
+                  colSpan={3 + CONSTRUCT_ORDER.length}
+                  className="py-0 px-0 h-[18px] relative"
+                  style={{ borderBottom: "none" }}
+                >
+                  <div className="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-naib-red/60" />
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 bg-card px-1.5 text-[8px] font-semibold uppercase tracking-wider text-naib-red/80">
+                    Minimum threshold
                   </span>
                 </td>
-                {CONSTRUCT_ORDER.map((key) => {
-                  const val = row.scores[key] ?? 0;
-                  const isHighWeight = highWeightConstructs.has(key);
-                  return (
-                    <td
-                      key={key}
-                      className={`py-0.5 px-1 text-center ${isHighWeight ? "border-l-2 border-l-naib-gold/30" : ""}`}
-                      onMouseEnter={(e) => {
-                        setHoveredCell({ key, val, x: e.clientX, y: e.clientY });
-                      }}
-                      onMouseLeave={() => setHoveredCell(null)}
-                    >
-                      <span
-                        className="inline-flex items-center justify-center w-8 h-5 text-[9px] font-medium font-mono"
-                        style={{
-                          backgroundColor: getCellBg(val),
-                          color: getCellColor(val),
-                        }}
-                      >
-                        {val}
-                      </span>
-                    </td>
-                  );
-                })}
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
 
-        {/* Custom tooltip */}
+        {/* Cell tooltip */}
         {hoveredCell && (() => {
           const meta = CONSTRUCTS[hoveredCell.key as keyof typeof CONSTRUCTS];
           const layerInfo = LAYER_INFO[meta.layer as LayerType];
@@ -320,7 +363,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                 <span className="text-[10px] font-semibold text-foreground uppercase tracking-wider">{meta.name}</span>
               </div>
               <p className="text-sm font-bold font-mono mb-1" style={{ color: tier.color }}>
-                {hoveredCell.val}<span className="text-[9px] font-normal text-muted-foreground ml-0.5">th — {tier.label}</span>
+                {hoveredCell.val}<span className="text-[9px] font-normal text-muted-foreground ml-0.5">th / {tier.label}</span>
               </p>
               <p className="text-[9px] text-muted-foreground font-mono">
                 Layer: {layerInfo.name}
@@ -329,6 +372,32 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                 <p className="text-[9px] text-muted-foreground font-mono">
                   Role weight: {Math.round(weight * 100)}%
                 </p>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Header tooltip */}
+        {hoveredHeader && (() => {
+          const meta = CONSTRUCTS[hoveredHeader.key as keyof typeof CONSTRUCTS];
+          const layerInfo = LAYER_INFO[meta.layer as LayerType];
+          const copy = CONSTRUCT_COPY[hoveredHeader.key];
+          return (
+            <div
+              className="fixed z-50 bg-card/95 backdrop-blur-sm p-3 shadow-xl border border-border max-w-[260px]"
+              style={{
+                left: hoveredHeader.x + 12,
+                top: hoveredHeader.y + 16,
+                pointerEvents: "none",
+                animation: "heatmapFadeIn 120ms ease-out",
+              }}
+            >
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <div className="w-2 h-2" style={{ backgroundColor: layerInfo.color }} />
+                <span className="text-[10px] font-semibold text-foreground uppercase tracking-wider">{meta.name}</span>
+              </div>
+              {copy && (
+                <p className="text-[10px] text-muted-foreground leading-relaxed">{copy}</p>
               )}
             </div>
           );
@@ -355,8 +424,8 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
           ))}
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-0.5 border-t-2 border-dashed border-naib-red/50" />
-          <span className="uppercase tracking-wider">Cutline</span>
+          <div className="w-4 h-0.5 border-t-2 border-dashed border-naib-red/60" />
+          <span className="uppercase tracking-wider text-naib-red/80">Minimum Threshold</span>
         </div>
       </div>
     </div>
