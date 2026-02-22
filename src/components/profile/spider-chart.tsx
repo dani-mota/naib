@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  ResponsiveContainer,
+  ResponsiveContainer, Customized,
 } from "recharts";
 import { CONSTRUCTS, LAYER_INFO, type LayerType } from "@/lib/constructs";
 
@@ -101,8 +101,13 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
 
   // Colored radial lines + subtle layer wedge fills, rendered behind the grid
   const LayerOverlay = useCallback((props: any) => {
-    const { cx, cy, outerRadius } = props;
-    if (!cx || !cy || !outerRadius) return null;
+    // Customized passes width/height; compute cx/cy/outerRadius matching RadarChart's 50%/50%/72%
+    const width = props.width ?? 0;
+    const height = props.height ?? 0;
+    const cx = props.cx ?? width / 2;
+    const cy = props.cy ?? height / 2;
+    const outerRadius = props.outerRadius ?? Math.min(width, height) * 0.72 / 2;
+    if (!outerRadius) return null;
 
     const count = data.length;
 
@@ -193,7 +198,7 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
               {/* Default polygon grid (concentric rings), no radial lines — we draw our own */}
               <PolarGrid stroke="var(--border)" radialLines={false} />
               {/* Layer-colored radial lines + subtle wedge fills */}
-              <LayerOverlay cx={0} cy={0} outerRadius={0} />
+              <Customized component={(props: any) => <LayerOverlay {...props} />} />
               <PolarAngleAxis
                 dataKey="construct"
                 tick={<CustomTick />}
