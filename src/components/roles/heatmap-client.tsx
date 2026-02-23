@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useCallback } from "react";
+import React, { useState, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ChevronUp, ChevronDown, Download, Image } from "lucide-react";
@@ -259,87 +259,82 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
           </thead>
           <tbody>
             {rows.map((row, i) => {
-              const isCutline = cutlineIndex === i;
+              const showCutlineBefore = cutlineIndex === i && cutlineIndex > 0;
               return (
-                <tr
-                  key={row.id}
-                  className="hover:bg-accent/30 transition-colors"
-                  style={{
-                    borderBottom: isCutline
-                      ? "none"
-                      : "1px solid var(--border)",
-                  }}
-                >
-                  <td className="sticky left-0 bg-card py-0 px-1.5">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(row.id)}
-                      onChange={() => toggleSelect(row.id)}
-                      className="border-border w-3 h-3"
-                    />
-                  </td>
-                  <td className="sticky left-7 bg-card py-0 px-1.5">
-                    <Link
-                      href={`/candidates/${row.id}`}
-                      className="text-[10px] font-medium text-foreground hover:text-naib-gold transition-colors"
-                    >
-                      {row.name}
-                    </Link>
-                  </td>
-                  <td className="py-0 px-0 text-center">
-                    <span
-                      className="inline-flex items-center justify-center w-full h-[22px] text-[9px] font-bold font-mono"
-                      style={{
-                        backgroundColor: getCellBg(row.composite),
-                        color: getCellColor(row.composite),
-                      }}
-                    >
-                      {row.composite}
-                    </span>
-                  </td>
-                  {CONSTRUCT_ORDER.map((key) => {
-                    const val = row.scores[key] ?? 0;
-                    const isHighWeight = highWeightConstructs.has(key);
-                    return (
+                <React.Fragment key={row.id}>
+                  {showCutlineBefore && (
+                    <tr>
                       <td
-                        key={key}
-                        className={`py-0 px-0 text-center ${isHighWeight ? "border-l-2 border-l-naib-gold/30" : ""}`}
-                        onMouseEnter={(e) => {
-                          setHoveredCell({ key, val, x: e.clientX, y: e.clientY });
-                        }}
-                        onMouseLeave={() => setHoveredCell(null)}
+                        colSpan={3 + CONSTRUCT_ORDER.length}
+                        className="py-0 px-0 h-[18px] relative"
+                        style={{ borderBottom: "none" }}
                       >
-                        <span
-                          className="inline-flex items-center justify-center w-full h-[22px] text-[9px] font-medium font-mono"
-                          style={{
-                            backgroundColor: getCellBg(val),
-                            color: getCellColor(val),
-                          }}
-                        >
-                          {val}
+                        <div className="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-naib-red/60" />
+                        <span className="absolute left-2 top-1/2 -translate-y-1/2 bg-card px-1.5 text-[8px] font-semibold uppercase tracking-wider text-naib-red/80">
+                          Minimum threshold
                         </span>
                       </td>
-                    );
-                  })}
-                </tr>
+                    </tr>
+                  )}
+                  <tr
+                    className="hover:bg-accent/30 transition-colors"
+                    style={{ borderBottom: "1px solid var(--border)" }}
+                  >
+                    <td className="sticky left-0 bg-card py-0 px-1.5">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(row.id)}
+                        onChange={() => toggleSelect(row.id)}
+                        className="border-border w-3 h-3"
+                      />
+                    </td>
+                    <td className="sticky left-7 bg-card py-0 px-1.5">
+                      <Link
+                        href={`/candidates/${row.id}`}
+                        className="text-[10px] font-medium text-foreground hover:text-naib-gold transition-colors"
+                      >
+                        {row.name}
+                      </Link>
+                    </td>
+                    <td className="py-0 px-0 text-center">
+                      <span
+                        className="inline-flex items-center justify-center w-full h-[22px] text-[9px] font-bold font-mono"
+                        style={{
+                          backgroundColor: getCellBg(row.composite),
+                          color: getCellColor(row.composite),
+                        }}
+                      >
+                        {row.composite}
+                      </span>
+                    </td>
+                    {CONSTRUCT_ORDER.map((key) => {
+                      const val = row.scores[key] ?? 0;
+                      const isHighWeight = highWeightConstructs.has(key);
+                      return (
+                        <td
+                          key={key}
+                          className={`py-0 px-0 text-center ${isHighWeight ? "border-l-2 border-l-naib-gold/30" : ""}`}
+                          onMouseEnter={(e) => {
+                            setHoveredCell({ key, val, x: e.clientX, y: e.clientY });
+                          }}
+                          onMouseLeave={() => setHoveredCell(null)}
+                        >
+                          <span
+                            className="inline-flex items-center justify-center w-full h-[22px] text-[9px] font-medium font-mono"
+                            style={{
+                              backgroundColor: getCellBg(val),
+                              color: getCellColor(val),
+                            }}
+                          >
+                            {val}
+                          </span>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </React.Fragment>
               );
             })}
-
-            {/* Cutline separator row */}
-            {cutlineIndex >= 0 && cutlineIndex < rows.length && (
-              <tr>
-                <td
-                  colSpan={3 + CONSTRUCT_ORDER.length}
-                  className="py-0 px-0 h-[18px] relative"
-                  style={{ borderBottom: "none" }}
-                >
-                  <div className="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-naib-red/60" />
-                  <span className="absolute left-2 top-1/2 -translate-y-1/2 bg-card px-1.5 text-[8px] font-semibold uppercase tracking-wider text-naib-red/80">
-                    Minimum threshold
-                  </span>
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
 
