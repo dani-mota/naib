@@ -28,7 +28,7 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
 
   const handleExportPNG = async () => {
     if (compareRef.current) {
-      await captureElementAsPNG(compareRef.current, "naib-comparison.png");
+      await captureElementAsPNG(compareRef.current, "aci-comparison.png");
     }
   };
 
@@ -44,7 +44,7 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
         }),
       ];
     });
-    downloadCSV("naib-comparison.csv", headers, csvRows);
+    downloadCSV("aci-comparison.csv", headers, csvRows);
   };
 
   const chartData = constructKeys.map((key) => {

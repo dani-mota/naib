@@ -112,7 +112,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       .replace(/[^a-zA-Z0-9_-]/g, "")
       .toLowerCase();
     const dateStamp = new Date().toISOString().slice(0, 10);
-    const filename = `NAIB_Scorecard_${safeName}_${dateStamp}.pdf`;
+    const filename = `ACI_Scorecard_${safeName}_${dateStamp}.pdf`;
 
     // ------------------------------------------------------------------
     // Return PDF response

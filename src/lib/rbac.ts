@@ -100,7 +100,7 @@ export function getMockSession() {
   return {
     user: {
       id: "mock-user-1",
-      email: "alex.chen@naib.io",
+      email: "alex.chen@arklight.io",
       name: "Alex Chen",
       role: "TA_LEADER" as AppUserRole,
       organizationId: "mock-org-1",

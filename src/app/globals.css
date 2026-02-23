@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* ── NAIB Brand Colors ── */
+  /* ── ACI Brand Colors ── */
   --color-naib-navy: #0F1729;
   --color-naib-blue: #2563EB;
   --color-naib-green: #059669;

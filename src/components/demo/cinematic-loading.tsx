@@ -47,9 +47,9 @@ export function CinematicLoading({ onComplete }: CinematicLoadingProps) {
 
   return (
     <div className="min-h-screen bg-naib-navy flex flex-col items-center justify-center p-4">
-      {/* NAIB Logo */}
+      {/* ACI Logo */}
       <h1 className="text-4xl font-bold text-white tracking-[0.2em] mb-12" style={{ fontFamily: "var(--font-dm-sans)" }}>
-        NAIB
+        ACI
       </h1>
 
       {/* Messages */}

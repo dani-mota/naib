@@ -21,7 +21,7 @@ export function TopNav() {
       <div className="h-full max-w-[1600px] mx-auto px-4 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <span className="text-lg font-bold tracking-tight text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
-            NAIB
+            ACI
           </span>
           <div className="hidden sm:block h-4 w-px bg-border" />
           <span className="hidden sm:block text-[10px] tracking-[0.2em] text-muted-foreground uppercase">

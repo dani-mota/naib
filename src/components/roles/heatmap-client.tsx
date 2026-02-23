@@ -143,12 +143,12 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
       String(row.composite),
       ...CONSTRUCT_ORDER.map((k) => String(row.scores[k] ?? 0)),
     ]);
-    downloadCSV(`naib-heatmap-${selectedRoleSlug}.csv`, headers, csvRows);
+    downloadCSV(`aci-heatmap-${selectedRoleSlug}.csv`, headers, csvRows);
   };
 
   const handleExportPNG = async () => {
     if (tableRef.current) {
-      await captureElementAsPNG(tableRef.current, `naib-heatmap-${selectedRoleSlug}.png`);
+      await captureElementAsPNG(tableRef.current, `aci-heatmap-${selectedRoleSlug}.png`);
     }
   };
 
@@ -442,7 +442,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                 <span className="text-[10px] font-bold font-mono" style={{ color: LAYER_INFO.BEHAVIORAL_INTEGRITY.color }}>{roleCutline.behavioralIntegrity}th</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-medium" style={{ color: LAYER_INFO.COGNITIVE_CORE.color }}>Learning Velocity</span>
+                <span className="text-[10px] font-medium" style={{ color: LAYER_INFO.COGNITIVE_CORE.color }}>Cognitive Core</span>
                 <span className="text-[10px] font-bold font-mono" style={{ color: LAYER_INFO.COGNITIVE_CORE.color }}>{roleCutline.learningVelocity}th</span>
               </div>
               {roleCutline.overallMinimum && (

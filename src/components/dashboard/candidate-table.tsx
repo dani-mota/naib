@@ -156,7 +156,7 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
       String(c.assessment?.redFlags.length ?? 0),
       new Date(c.createdAt).toLocaleDateString(),
     ]);
-    downloadCSV("naib-candidates.csv", headers, csvRows);
+    downloadCSV("aci-candidates.csv", headers, csvRows);
   };
 
   const handleBatchStatus = async () => {

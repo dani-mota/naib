@@ -22,7 +22,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NAIB — NextGen Aptitude & Integrity Battery",
+  title: "ACI — Arklight Cognitive Index",
   description:
     "AI-powered talent assessment platform for advanced manufacturing",
 };

@@ -69,7 +69,7 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
       {/* Nav */}
       <header className="h-12 bg-card border-b border-border flex items-center justify-between px-6">
         <span className="text-lg font-bold text-foreground tracking-[0.15em]" style={{ fontFamily: "var(--font-dm-sans)" }}>
-          NAIB
+          ACI
         </span>
         <Link href="/signup">
           <Button variant="gold" size="sm">Get Started</Button>
@@ -162,7 +162,7 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
             Ready to assess your real candidates?
           </h2>
           <p className="text-white/60 mb-6 max-w-lg mx-auto text-xs uppercase tracking-wider">
-            NAIB measures 12 cognitive, technical, and behavioral constructs in 45-60 minutes.
+            ACI measures 12 cognitive, technical, and behavioral constructs in 45-60 minutes.
             Get composite scores, intelligence reports, and actionable hiring recommendations.
           </p>
           <div className="flex justify-center gap-3">

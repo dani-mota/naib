@@ -15,10 +15,10 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
       <div className="bg-card border border-border shadow-lg p-8 relative z-10">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
-            NAIB
+            ACI
           </h1>
           <p className="text-[10px] tracking-[0.3em] text-muted-foreground mt-1 uppercase font-mono">
-            NextGen Aptitude & Integrity Battery
+            Arklight Cognitive Index
           </p>
         </div>
 

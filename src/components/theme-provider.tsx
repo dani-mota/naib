@@ -23,7 +23,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("naib-theme") as Theme | null;
+    const stored = localStorage.getItem("aci-theme") as Theme | null;
     if (stored === "dark" || stored === "light") {
       setTheme(stored);
     } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
@@ -40,7 +40,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       root.classList.remove("dark");
     }
-    localStorage.setItem("naib-theme", theme);
+    localStorage.setItem("aci-theme", theme);
   }, [theme, mounted]);
 
   const toggleTheme = () => {
