@@ -43,9 +43,11 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [hoveredCell, setHoveredCell] = useState<{ key: string; val: number; x: number; y: number } | null>(null);
   const [hoveredHeader, setHoveredHeader] = useState<{ key: string; x: number; y: number } | null>(null);
+  const [hoveredCutline, setHoveredCutline] = useState<{ x: number; y: number } | null>(null);
 
   const selectedRole = roles.find((r: any) => r.slug === selectedRoleSlug);
   const roleWeights = weights.filter((w: any) => w.roleId === selectedRole?.id);
+  const roleCutline = cutlines.find((c: any) => c.roleId === selectedRole?.id);
 
   const highWeightConstructs = useMemo(() => {
     const sorted = [...roleWeights].sort((a: any, b: any) => b.weight - a.weight);
@@ -56,6 +58,16 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
     const map: Record<string, number> = {};
     for (const w of roleWeights) map[w.constructId] = w.weight;
     return map;
+  }, [roleWeights]);
+
+  const topWeightedConstructs = useMemo(() => {
+    return [...roleWeights]
+      .sort((a: any, b: any) => b.weight - a.weight)
+      .slice(0, 4)
+      .map((w: any) => ({
+        name: CONSTRUCTS[w.constructId as keyof typeof CONSTRUCTS]?.name ?? w.constructId,
+        weight: Math.round(w.weight * 100),
+      }));
   }, [roleWeights]);
 
   const rows = useMemo(() => {
@@ -263,7 +275,12 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
               return (
                 <React.Fragment key={row.id}>
                   {showCutlineBefore && (
-                    <tr>
+                    <tr
+                      onMouseEnter={(e) => setHoveredCutline({ x: e.clientX, y: e.clientY })}
+                      onMouseMove={(e) => setHoveredCutline({ x: e.clientX, y: e.clientY })}
+                      onMouseLeave={() => setHoveredCutline(null)}
+                      className="cursor-help"
+                    >
                       <td
                         colSpan={3 + CONSTRUCT_ORDER.length}
                         className="py-0 px-0 h-[18px] relative"
@@ -397,6 +414,61 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
             </div>
           );
         })()}
+
+        {/* Cutline tooltip */}
+        {hoveredCutline && roleCutline && (
+          <div
+            className="fixed z-50 bg-card/95 backdrop-blur-sm p-4 shadow-xl border border-border max-w-[300px]"
+            style={{
+              left: hoveredCutline.x + 12,
+              top: hoveredCutline.y - 12,
+              pointerEvents: "none",
+              animation: "heatmapFadeIn 120ms ease-out",
+            }}
+          >
+            <p className="text-[10px] font-semibold text-naib-red/90 uppercase tracking-wider mb-2">
+              {selectedRole?.name} Threshold
+            </p>
+            <p className="text-[10px] text-muted-foreground leading-relaxed mb-3">
+              Candidates below this line did not meet the minimum requirements for this role. The threshold is based on three layer-level gates:
+            </p>
+            <div className="space-y-1.5 mb-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-medium" style={{ color: LAYER_INFO.TECHNICAL_APTITUDE.color }}>Technical Aptitude</span>
+                <span className="text-[10px] font-bold font-mono" style={{ color: LAYER_INFO.TECHNICAL_APTITUDE.color }}>{roleCutline.technicalAptitude}th</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-medium" style={{ color: LAYER_INFO.BEHAVIORAL_INTEGRITY.color }}>Behavioral Integrity</span>
+                <span className="text-[10px] font-bold font-mono" style={{ color: LAYER_INFO.BEHAVIORAL_INTEGRITY.color }}>{roleCutline.behavioralIntegrity}th</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-medium" style={{ color: LAYER_INFO.COGNITIVE_CORE.color }}>Learning Velocity</span>
+                <span className="text-[10px] font-bold font-mono" style={{ color: LAYER_INFO.COGNITIVE_CORE.color }}>{roleCutline.learningVelocity}th</span>
+              </div>
+              {roleCutline.overallMinimum && (
+                <div className="flex items-center justify-between pt-1 border-t border-border">
+                  <span className="text-[10px] font-medium text-muted-foreground">Overall Minimum</span>
+                  <span className="text-[10px] font-bold font-mono text-foreground">{roleCutline.overallMinimum}th</span>
+                </div>
+              )}
+            </div>
+            {topWeightedConstructs.length > 0 && (
+              <>
+                <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+                  Most weighted constructs
+                </p>
+                <div className="space-y-1">
+                  {topWeightedConstructs.map((c) => (
+                    <div key={c.name} className="flex items-center justify-between">
+                      <span className="text-[10px] text-foreground">{c.name}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground">{c.weight}%</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Legend */}
