@@ -28,8 +28,8 @@ export default function LoginPage() {
       footer={
         <span>
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-naib-gold hover:text-naib-gold/80 font-medium">
-            Create one
+          <Link href="/signup" className="text-aci-gold hover:text-aci-gold/80 font-medium">
+            Request Access
           </Link>
         </span>
       }
@@ -64,7 +64,7 @@ export default function LoginPage() {
             <input type="checkbox" className="border-border" />
             Remember me
           </label>
-          <Link href="/forgot-password" className="text-xs text-naib-blue hover:text-naib-blue/80">
+          <Link href="/forgot-password" className="text-xs text-aci-blue hover:text-aci-blue/80">
             Forgot password?
           </Link>
         </div>

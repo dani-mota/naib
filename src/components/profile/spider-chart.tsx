@@ -12,6 +12,8 @@ interface SpiderChartProps {
   roleWeights: any[];
   cutline?: any;
   roleSlug?: string;
+  weightDiffs?: Record<string, number>;
+  showAnimation?: boolean;
 }
 
 function getBenchmark(constructKey: string, layer: LayerType, cutline: any): number {
@@ -22,7 +24,7 @@ function getBenchmark(constructKey: string, layer: LayerType, cutline: any): num
   return cutline.overallMinimum ?? 30;
 }
 
-export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: SpiderChartProps) {
+export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug, weightDiffs, showAnimation }: SpiderChartProps) {
   const [viewType, setViewType] = useState<"radar" | "bar">("radar");
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
   const [labelPos, setLabelPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -54,23 +56,43 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
   const CustomDot = useCallback((props: any) => {
     const { cx, cy, payload } = props;
     if (!payload) return null;
+    const diff = showAnimation && weightDiffs ? weightDiffs[payload.key] : 0;
+    const pulseColor = diff > 0 ? "rgba(5, 150, 105, 0.6)" : diff < 0 ? "rgba(217, 119, 6, 0.6)" : null;
     return (
-      <circle
-        cx={cx}
-        cy={cy}
-        r={4}
-        fill={payload.layerColor}
-        stroke="var(--card)"
-        strokeWidth={2}
-      />
+      <g>
+        {pulseColor && (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={10}
+            fill="none"
+            stroke={pulseColor}
+            strokeWidth={2}
+          >
+            <animate attributeName="r" from="4" to="14" dur="0.6s" repeatCount="2" />
+            <animate attributeName="opacity" from="1" to="0" dur="0.6s" repeatCount="2" />
+          </circle>
+        )}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={4}
+          fill={payload.layerColor}
+          stroke="var(--card)"
+          strokeWidth={2}
+        />
+      </g>
     );
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showAnimation, weightDiffs]);
 
   // Axis labels colored by layer, hover triggers tooltip
   const CustomTick = useCallback((props: any) => {
     const { x, y, payload } = props;
     const d = data.find((item) => item.construct === payload.value);
     const color = d?.layerColor ?? "var(--muted-foreground)";
+    const diff = showAnimation && weightDiffs && d ? weightDiffs[d.key] : 0;
+    const animColor = diff > 0 ? "#059669" : diff < 0 ? "#D97706" : null;
 
     return (
       <g
@@ -82,12 +104,17 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
         style={{ cursor: "pointer" }}
       >
         <circle cx={x} cy={y} r={12} fill="transparent" />
+        {animColor && (
+          <circle cx={x} cy={y} r={14} fill={animColor} fillOpacity={0.15}>
+            <animate attributeName="fillOpacity" values="0.15;0.3;0.15" dur="0.6s" repeatCount="2" />
+          </circle>
+        )}
         <text
           x={x}
           y={y}
           textAnchor="middle"
           dominantBaseline="central"
-          fill={color}
+          fill={animColor ?? color}
           fontSize={11}
           fontWeight={700}
           style={{ fontFamily: "var(--font-mono, monospace)" }}
@@ -97,7 +124,7 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
       </g>
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, showAnimation, weightDiffs]);
 
   // Colored radial lines + subtle layer wedge fills, rendered behind the grid
   const LayerOverlay = useCallback((props: any) => {
@@ -238,29 +265,33 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
         </div>
       ) : (
         <div className="space-y-1.5">
-          {data.map((d) => (
-            <div key={d.construct} className="flex items-center gap-3">
-              <span className="w-7 text-[10px] font-mono font-medium text-right" style={{ color: d.layerColor }}>{d.construct}</span>
-              <div className="flex-1 h-5 bg-muted overflow-hidden relative">
-                <div
-                  className="h-full transition-all duration-500"
-                  style={{
-                    width: `${d.percentile}%`,
-                    backgroundColor: d.layerColor,
-                    opacity: 0.8,
-                  }}
-                />
-                {/* Benchmark marker */}
-                <div
-                  className="absolute top-0 bottom-0 w-px bg-muted-foreground/50"
-                  style={{ left: `${d.benchmark}%` }}
-                />
+          {data.map((d) => {
+            const diff = showAnimation && weightDiffs ? weightDiffs[d.key] : 0;
+            const animClass = diff > 0 ? "animate-pulse-green" : diff < 0 ? "animate-pulse-amber" : "";
+            return (
+              <div key={d.construct} className={`flex items-center gap-3 ${animClass}`}>
+                <span className={`w-7 text-[10px] font-mono font-medium text-right ${diff > 0 ? "animate-pulse-green-text" : diff < 0 ? "animate-pulse-amber-text" : ""}`} style={{ color: d.layerColor }}>{d.construct}</span>
+                <div className="flex-1 h-5 bg-muted overflow-hidden relative">
+                  <div
+                    className="h-full transition-all duration-500"
+                    style={{
+                      width: `${d.percentile}%`,
+                      backgroundColor: d.layerColor,
+                      opacity: 0.8,
+                    }}
+                  />
+                  {/* Benchmark marker */}
+                  <div
+                    className="absolute top-0 bottom-0 w-px bg-muted-foreground/50"
+                    style={{ left: `${d.benchmark}%` }}
+                  />
+                </div>
+                <span className="w-8 text-[10px] font-mono font-medium tabular-nums text-right" style={{ color: d.layerColor }}>
+                  {d.percentile}
+                </span>
               </div>
-              <span className="w-8 text-[10px] font-mono font-medium tabular-nums text-right" style={{ color: d.layerColor }}>
-                {d.percentile}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -285,14 +316,14 @@ export function SpiderChart({ subtestResults, roleWeights, cutline, roleSlug }: 
           <p className="text-[10px] text-muted-foreground font-mono mb-2">
             Benchmark: {hoveredData.benchmark}th
             {hoveredData.percentile >= hoveredData.benchmark
-              ? <span className="text-naib-green ml-1">(+{hoveredData.percentile - hoveredData.benchmark} above)</span>
-              : <span className="text-naib-red ml-1">({hoveredData.percentile - hoveredData.benchmark} below)</span>
+              ? <span className="text-aci-green ml-1">(+{hoveredData.percentile - hoveredData.benchmark} above)</span>
+              : <span className="text-aci-red ml-1">({hoveredData.percentile - hoveredData.benchmark} below)</span>
             }
           </p>
           <p className="text-[10px] text-muted-foreground leading-relaxed mb-2">{hoveredData.definition}</p>
           {hoveredData.roleRelevance && (
             <div className="pt-2 border-t border-border">
-              <p className="text-[9px] text-naib-gold uppercase tracking-wider font-medium mb-1">Why This Matters</p>
+              <p className="text-[9px] text-aci-gold uppercase tracking-wider font-medium mb-1">Why This Matters</p>
               <p className="text-[10px] text-muted-foreground leading-relaxed">{hoveredData.roleRelevance}</p>
             </div>
           )}

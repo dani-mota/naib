@@ -40,7 +40,7 @@ export default async function ComparePage({ searchParams }: PageProps) {
           <h2 className="text-sm font-semibold text-foreground mb-2 uppercase tracking-wider">Select Candidates to Compare</h2>
           <p className="text-xs text-muted-foreground">
             Go to the{" "}
-            <a href="/roles" className="text-naib-gold hover:underline">Role Matrix</a>{" "}
+            <a href="/roles" className="text-aci-gold hover:underline">Role Matrix</a>{" "}
             and select 2-3 candidates to compare side-by-side.
           </p>
         </div>

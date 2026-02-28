@@ -26,10 +26,10 @@ export function PipelineCards({ roles }: PipelineCardsProps) {
           <Link
             key={role.slug}
             href={`/roles/${role.slug}`}
-            className="bg-card border border-border p-4 hover:border-naib-gold/30 transition-all group"
+            className="bg-card border border-border p-4 hover:border-aci-gold/30 transition-all group"
           >
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-medium text-foreground truncate uppercase tracking-wider group-hover:text-naib-gold transition-colors">
+              <h3 className="text-xs font-medium text-foreground truncate uppercase tracking-wider group-hover:text-aci-gold transition-colors">
                 {role.name}
               </h3>
               <Users className="w-3.5 h-3.5 text-muted-foreground" />
@@ -40,14 +40,14 @@ export function PipelineCards({ roles }: PipelineCardsProps) {
             <div className="mb-2">
               <div className="flex items-center justify-between text-[10px] mb-1">
                 <span className="text-muted-foreground uppercase tracking-wider">Strong Fit</span>
-                <span className="font-mono font-medium text-naib-green flex items-center gap-1">
+                <span className="font-mono font-medium text-aci-green flex items-center gap-1">
                   <TrendingUp className="w-3 h-3" />
                   {strongFitPct}%
                 </span>
               </div>
               <div className="h-1 bg-muted overflow-hidden">
                 <div
-                  className="h-full bg-naib-green transition-all duration-500"
+                  className="h-full bg-aci-green transition-all duration-500"
                   style={{ width: `${strongFitPct}%` }}
                 />
               </div>

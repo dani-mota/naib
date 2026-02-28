@@ -15,11 +15,11 @@ interface LayerResultsProps {
 const LAYERS: LayerType[] = ["COGNITIVE_CORE", "TECHNICAL_APTITUDE", "BEHAVIORAL_INTEGRITY"];
 
 function getPerformanceTier(p: number): { label: string; color: string; Icon: any; description: string } {
-  if (p >= 90) return { label: "EXCEPTIONAL", color: "text-naib-green", Icon: TrendingUp, description: "Top 10% — a standout capability that sets this candidate apart from the vast majority of the talent pool." };
-  if (p >= 75) return { label: "STRONG", color: "text-naib-green", Icon: TrendingUp, description: "Above average — a reliable strength that can be leveraged for immediate contribution and peer mentoring." };
+  if (p >= 90) return { label: "EXCEPTIONAL", color: "text-aci-green", Icon: TrendingUp, description: "Top 10% — a standout capability that sets this candidate apart from the vast majority of the talent pool." };
+  if (p >= 75) return { label: "STRONG", color: "text-aci-green", Icon: TrendingUp, description: "Above average — a reliable strength that can be leveraged for immediate contribution and peer mentoring." };
   if (p >= 50) return { label: "SOLID", color: "text-foreground", Icon: Minus, description: "At or above the midpoint — adequate for standard role demands with no special intervention needed." };
-  if (p >= 25) return { label: "DEVELOPING", color: "text-naib-amber", Icon: TrendingDown, description: "Below average — may require additional support, training, or compensating team strengths to meet role demands." };
-  return { label: "LIMITED", color: "text-naib-red", Icon: TrendingDown, description: "Bottom quartile — a significant gap that should factor into hiring decisions for roles where this construct is weighted." };
+  if (p >= 25) return { label: "DEVELOPING", color: "text-aci-amber", Icon: TrendingDown, description: "Below average — may require additional support, training, or compensating team strengths to meet role demands." };
+  return { label: "LIMITED", color: "text-aci-red", Icon: TrendingDown, description: "Bottom quartile — a significant gap that should factor into hiring decisions for roles where this construct is weighted." };
 }
 
 function getConstructInsight(construct: string, percentile: number): string {
@@ -202,7 +202,7 @@ export function LayerResults({ subtestResults, aiInteractions, roleSlug }: Layer
                               <ScoreBar percentile={result.percentile} showLabel={false} height={3} />
                             </div>
                             {interactions.length > 0 && (
-                              <MessageSquare className="w-3 h-3 text-naib-blue" />
+                              <MessageSquare className="w-3 h-3 text-aci-blue" />
                             )}
                           </button>
 
@@ -241,8 +241,8 @@ export function LayerResults({ subtestResults, aiInteractions, roleSlug }: Layer
                               {roleSlug && meta?.roleRelevance[roleSlug] && (
                                 <div className="p-2 bg-accent/30 border border-border mb-3">
                                   <div className="flex items-center gap-1.5 mb-1">
-                                    <Target className="w-3 h-3 text-naib-gold" />
-                                    <p className="text-[9px] text-naib-gold uppercase tracking-wider font-medium">Role Relevance</p>
+                                    <Target className="w-3 h-3 text-aci-gold" />
+                                    <p className="text-[9px] text-aci-gold uppercase tracking-wider font-medium">Role Relevance</p>
                                   </div>
                                   <p className="text-[10px] text-muted-foreground leading-relaxed">{meta.roleRelevance[roleSlug]}</p>
                                 </div>
@@ -252,8 +252,8 @@ export function LayerResults({ subtestResults, aiInteractions, roleSlug }: Layer
                               {getDevelopmentRec(result.construct, result.percentile) && (
                                 <div className="p-2 bg-accent/30 border border-border mb-3">
                                   <div className="flex items-center gap-1.5 mb-1">
-                                    <TrendingUp className="w-3 h-3 text-naib-blue" />
-                                    <p className="text-[9px] text-naib-blue uppercase tracking-wider font-medium">Development Path</p>
+                                    <TrendingUp className="w-3 h-3 text-aci-blue" />
+                                    <p className="text-[9px] text-aci-blue uppercase tracking-wider font-medium">Development Path</p>
                                   </div>
                                   <p className="text-[10px] text-muted-foreground leading-relaxed">{getDevelopmentRec(result.construct, result.percentile)}</p>
                                 </div>
@@ -265,7 +265,7 @@ export function LayerResults({ subtestResults, aiInteractions, roleSlug }: Layer
 
                               {interactions.length > 0 && (
                                 <div className="mt-2 space-y-1.5">
-                                  <p className="text-[10px] font-medium text-naib-blue uppercase tracking-wider">AI Follow-up Interactions</p>
+                                  <p className="text-[10px] font-medium text-aci-blue uppercase tracking-wider">AI Follow-up Interactions</p>
                                   {interactions.map((ai: any) => (
                                     <div key={ai.id} className="bg-card border border-border p-2 text-[10px] space-y-1">
                                       <p className="text-muted-foreground"><strong className="text-foreground">Q:</strong> {ai.aiPrompt}</p>

@@ -275,7 +275,7 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
               return (
                 <tr
                   key={candidate.id}
-                  className={`border-b border-border/50 hover:bg-accent/50 transition-colors ${isSelected ? "bg-naib-gold/5" : ""}`}
+                  className={`border-b border-border/50 hover:bg-accent/50 transition-colors ${isSelected ? "bg-aci-gold/5" : ""}`}
                 >
                   <td className="py-2.5 px-3">
                     <input
@@ -289,7 +289,7 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
                     <Link href={`/candidates/${candidate.id}`} className="flex items-center gap-3 group">
                       <InitialsBadge firstName={candidate.firstName} lastName={candidate.lastName} size="sm" />
                       <div>
-                        <p className="text-xs font-medium text-foreground group-hover:text-naib-gold transition-colors">
+                        <p className="text-xs font-medium text-foreground group-hover:text-aci-gold transition-colors">
                           {candidate.firstName} {candidate.lastName}
                         </p>
                         <p className="text-[10px] text-muted-foreground font-mono">{candidate.email}</p>
@@ -307,7 +307,7 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
                   </td>
                   <td className="py-2.5 px-4">
                     {flagCount > 0 && (
-                      <span className={`flex items-center gap-1 text-[10px] font-mono font-medium ${hasCritical ? "text-naib-red" : "text-naib-amber"}`}>
+                      <span className={`flex items-center gap-1 text-[10px] font-mono font-medium ${hasCritical ? "text-aci-red" : "text-aci-amber"}`}>
                         <AlertTriangle className="w-3 h-3" />
                         {flagCount}
                       </span>
@@ -362,7 +362,7 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
               <button
                 onClick={handleBatchStatus}
                 disabled={batchLoading}
-                className="px-2.5 py-1 bg-naib-gold text-naib-navy font-semibold hover:bg-naib-gold/90 transition-colors disabled:opacity-50"
+                className="px-2.5 py-1 bg-aci-gold text-aci-navy font-semibold hover:bg-aci-gold/90 transition-colors disabled:opacity-50"
               >
                 {batchLoading ? "..." : "Apply"}
               </button>

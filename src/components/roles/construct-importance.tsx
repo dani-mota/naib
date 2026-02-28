@@ -51,11 +51,11 @@ export function ConstructImportance({ constructs, roleSlug }: ConstructImportanc
                   return (
                     <div
                       key={c.constructId}
-                      className={`p-2.5 border border-border/50 ${c.isCritical ? "border-l-2 border-l-naib-gold bg-naib-gold/5" : ""}`}
+                      className={`p-2.5 border border-border/50 ${c.isCritical ? "border-l-2 border-l-aci-gold bg-aci-gold/5" : ""}`}
                     >
                       <div className="flex items-center gap-3">
                         {/* Rank */}
-                        <span className={`text-[10px] font-mono font-bold w-5 text-center ${c.isCritical ? "text-naib-gold" : "text-muted-foreground"}`}>
+                        <span className={`text-[10px] font-mono font-bold w-5 text-center ${c.isCritical ? "text-aci-gold" : "text-muted-foreground"}`}>
                           #{c.rank}
                         </span>
 
@@ -86,7 +86,7 @@ export function ConstructImportance({ constructs, roleSlug }: ConstructImportanc
 
                         {/* Critical badge */}
                         {c.isCritical && (
-                          <span className="text-[9px] font-mono font-medium uppercase tracking-wider text-naib-gold px-1.5 py-0.5 bg-naib-gold/10 border border-naib-gold/30">
+                          <span className="text-[9px] font-mono font-medium uppercase tracking-wider text-aci-gold px-1.5 py-0.5 bg-aci-gold/10 border border-aci-gold/30">
                             Critical
                           </span>
                         )}

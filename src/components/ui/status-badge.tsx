@@ -7,22 +7,22 @@ interface StatusBadgeProps {
 
 const STATUS_CONFIG: Record<string, { bg: string; text: string; border: string; dot: string }> = {
   RECOMMENDED: {
-    bg: "bg-naib-green/10 dark:bg-naib-green/15",
-    text: "text-naib-green",
-    border: "border-naib-green/20",
-    dot: "bg-naib-green",
+    bg: "bg-aci-green/10 dark:bg-aci-green/15",
+    text: "text-aci-green",
+    border: "border-aci-green/20",
+    dot: "bg-aci-green",
   },
   REVIEW_REQUIRED: {
-    bg: "bg-naib-amber/10 dark:bg-naib-amber/15",
-    text: "text-naib-amber",
-    border: "border-naib-amber/20",
-    dot: "bg-naib-amber",
+    bg: "bg-aci-amber/10 dark:bg-aci-amber/15",
+    text: "text-aci-amber",
+    border: "border-aci-amber/20",
+    dot: "bg-aci-amber",
   },
   DO_NOT_ADVANCE: {
-    bg: "bg-naib-red-muted/10 dark:bg-naib-red-muted/15",
-    text: "text-naib-red-muted dark:text-naib-red",
-    border: "border-naib-red-muted/20",
-    dot: "bg-naib-red-muted dark:bg-naib-red",
+    bg: "bg-aci-red-muted/10 dark:bg-aci-red-muted/15",
+    text: "text-aci-red-muted dark:text-aci-red",
+    border: "border-aci-red-muted/20",
+    dot: "bg-aci-red-muted dark:bg-aci-red",
   },
   INCOMPLETE: {
     bg: "bg-muted",

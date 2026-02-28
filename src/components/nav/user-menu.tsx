@@ -25,7 +25,7 @@ export function UserMenu() {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-2 py-1 text-muted-foreground hover:text-foreground transition-colors"
       >
-        <div className="w-6 h-6 bg-naib-blue flex items-center justify-center text-[10px] font-semibold text-white">
+        <div className="w-6 h-6 bg-aci-blue flex items-center justify-center text-[10px] font-semibold text-white">
           {session.user.name.split(" ").map(n => n[0]).join("")}
         </div>
         <span className="hidden md:block text-xs font-medium">{session.user.name}</span>
@@ -37,7 +37,7 @@ export function UserMenu() {
           <div className="px-3 py-2 border-b border-border">
             <p className="text-xs font-medium text-foreground">{session.user.name}</p>
             <p className="text-[11px] text-muted-foreground">{session.user.email}</p>
-            <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 bg-naib-blue/10 text-naib-blue font-mono font-medium tracking-wide uppercase">
+            <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 bg-aci-blue/10 text-aci-blue font-mono font-medium tracking-wide uppercase">
               {session.user.role.replace("_", " ")}
             </span>
           </div>

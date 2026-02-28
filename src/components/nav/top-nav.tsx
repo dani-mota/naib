@@ -4,7 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Grid3X3, GitCompareArrows, Sparkles, Sun, Moon } from "lucide-react";
 import { UserMenu } from "./user-menu";
+import { NotificationBell } from "./notification-bell";
 import { useTheme } from "@/components/theme-provider";
+import type { Notification } from "@/lib/notifications";
+
+function hoursAgo(h: number) { return new Date(Date.now() - h * 3600000); }
+function daysAgo(d: number) { return new Date(Date.now() - d * 86400000); }
+
+const MOCK_NOTIFICATIONS: Notification[] = [
+  { id: "n1", type: "ASSESSMENT_COMPLETED", title: "Assessment Completed", message: "Sarah Okafor completed their CNC Machinist assessment.", timestamp: hoursAgo(2), read: false },
+  { id: "n2", type: "AWAITING_DECISION", title: "Awaiting Decision", message: "Kevin Park has been awaiting decision for 3 days.", timestamp: hoursAgo(72), read: false },
+  { id: "n3", type: "ASSESSMENT_COMPLETED", title: "Assessment Completed", message: "Maria Santos completed their Manufacturing Engineer assessment.", timestamp: hoursAgo(6), read: false },
+  { id: "n4", type: "STATUS_CHANGED", title: "Status Updated", message: "James Chen marked as Strong Fit for CAM Programmer.", timestamp: daysAgo(1), read: true },
+  { id: "n5", type: "NEW_CANDIDATE", title: "New Candidate", message: "Lisa Wong was added to the CMM Programmer pipeline.", timestamp: daysAgo(2), read: true },
+];
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -38,7 +51,7 @@ export function TopNav() {
                 href={href}
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
                   isActive
-                    ? "text-naib-gold border-b-2 border-naib-gold"
+                    ? "text-aci-gold border-b-2 border-aci-gold"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -50,7 +63,7 @@ export function TopNav() {
           <div className="w-px h-5 bg-border mx-1.5" />
           <Link
             href="/demo"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-naib-gold hover:text-naib-gold/80 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-aci-gold hover:text-aci-gold/80 transition-colors"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Demo</span>
@@ -58,6 +71,7 @@ export function TopNav() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <NotificationBell notifications={MOCK_NOTIFICATIONS} />
           <button
             onClick={toggleTheme}
             className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"

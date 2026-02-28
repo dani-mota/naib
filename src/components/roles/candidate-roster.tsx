@@ -38,9 +38,9 @@ interface CandidateRosterProps {
 }
 
 const VARIANT_CONFIG = {
-  recommended: { borderColor: "border-l-naib-green", emptyMsg: "No candidates meet all cutline thresholds for this role." },
-  review: { borderColor: "border-l-naib-amber", emptyMsg: "No candidates in the review zone." },
-  doNotAdvance: { borderColor: "border-l-naib-red-muted", emptyMsg: "No candidates flagged as not recommended." },
+  recommended: { borderColor: "border-l-aci-green", emptyMsg: "No candidates meet all cutline thresholds for this role." },
+  review: { borderColor: "border-l-aci-amber", emptyMsg: "No candidates in the review zone." },
+  doNotAdvance: { borderColor: "border-l-aci-red-muted", emptyMsg: "No candidates flagged as not recommended." },
 };
 
 export function CandidateRoster({ title, subtitle, candidates, variant }: CandidateRosterProps) {
@@ -78,14 +78,14 @@ export function CandidateRoster({ title, subtitle, candidates, variant }: Candid
               <InitialsBadge firstName={c.firstName} lastName={c.lastName} size="sm" />
 
               <div className="flex-1 min-w-0">
-                <Link href={`/candidates/${c.id}`} className="text-xs font-medium text-foreground hover:text-naib-gold transition-colors">
+                <Link href={`/candidates/${c.id}`} className="text-xs font-medium text-foreground hover:text-aci-gold transition-colors">
                   {c.firstName} {c.lastName}
                 </Link>
                 {/* Failure reasons for review/doNotAdvance */}
                 {variant !== "recommended" && c.failedDimensions.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {c.failedDimensions.map((f) => (
-                      <span key={f.name} className="text-[9px] font-mono text-naib-red px-1 py-0.5 bg-naib-red/5 border border-naib-red/20">
+                      <span key={f.name} className="text-[9px] font-mono text-aci-red px-1 py-0.5 bg-aci-red/5 border border-aci-red/20">
                         {f.name}: {f.actual} / min {f.required}
                       </span>
                     ))}
@@ -95,7 +95,7 @@ export function CandidateRoster({ title, subtitle, candidates, variant }: Candid
                 {variant === "doNotAdvance" && c.redFlags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {c.redFlags.filter((f) => f.severity === "CRITICAL").map((f, j) => (
-                      <span key={j} className="text-[9px] font-mono text-naib-red px-1 py-0.5 bg-naib-red/5 border border-naib-red/20">
+                      <span key={j} className="text-[9px] font-mono text-aci-red px-1 py-0.5 bg-aci-red/5 border border-aci-red/20">
                         {f.title}
                       </span>
                     ))}

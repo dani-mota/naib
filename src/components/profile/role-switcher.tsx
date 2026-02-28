@@ -25,12 +25,12 @@ export function RoleSwitcher({ roles, selectedSlug, onSelect, compositeScores }:
               onClick={() => onSelect(role.slug)}
               className={`w-full flex items-center gap-3 p-2.5 text-left transition-all ${
                 isSelected
-                  ? "bg-naib-gold/5 border border-naib-gold/30"
+                  ? "bg-aci-gold/5 border border-aci-gold/30"
                   : "hover:bg-accent/50 border border-transparent"
               }`}
             >
               <div className="flex-1 min-w-0">
-                <p className={`text-xs font-medium truncate uppercase tracking-wider ${isSelected ? "text-naib-gold" : "text-foreground"}`}>
+                <p className={`text-xs font-medium truncate uppercase tracking-wider ${isSelected ? "text-aci-gold" : "text-foreground"}`}>
                   {role.name}
                 </p>
                 <div className="mt-1">
@@ -38,7 +38,7 @@ export function RoleSwitcher({ roles, selectedSlug, onSelect, compositeScores }:
                 </div>
               </div>
               <div className="text-right">
-                <span className={`text-sm font-bold font-mono ${isSelected ? "text-naib-gold" : "text-foreground"}`}>
+                <span className={`text-sm font-bold font-mono ${isSelected ? "text-aci-gold" : "text-foreground"}`}>
                   {score?.percentile ?? "—"}
                 </span>
                 <p className="text-[10px] text-muted-foreground font-mono">

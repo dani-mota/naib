@@ -46,7 +46,7 @@ export function CinematicLoading({ onComplete }: CinematicLoadingProps) {
   }, [onComplete]);
 
   return (
-    <div className="min-h-screen bg-naib-navy flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-aci-navy flex flex-col items-center justify-center p-4">
       {/* ACI Logo */}
       <h1 className="text-4xl font-bold text-white tracking-[0.2em] mb-12" style={{ fontFamily: "var(--font-dm-sans)" }}>
         ACI

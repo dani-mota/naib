@@ -14,9 +14,9 @@ const ICONS: Record<string, any> = {
 };
 
 const RISK_CONFIG = {
-  low: { label: "LOW RISK", color: "text-naib-green", bg: "bg-naib-green/5", border: "border-naib-green/20", Icon: CheckCircle },
-  moderate: { label: "MODERATE", color: "text-naib-amber", bg: "bg-naib-amber/5", border: "border-naib-amber/20", Icon: Info },
-  elevated: { label: "ELEVATED", color: "text-naib-red", bg: "bg-naib-red/5", border: "border-naib-red/20", Icon: AlertTriangle },
+  low: { label: "LOW RISK", color: "text-aci-green", bg: "bg-aci-green/5", border: "border-aci-green/20", Icon: CheckCircle },
+  moderate: { label: "MODERATE", color: "text-aci-amber", bg: "bg-aci-amber/5", border: "border-aci-amber/20", Icon: Info },
+  elevated: { label: "ELEVATED", color: "text-aci-red", bg: "bg-aci-red/5", border: "border-aci-red/20", Icon: AlertTriangle },
 };
 
 interface IntelligenceReportProps {
@@ -57,7 +57,7 @@ export function IntelligenceReport({ subtestResults, roleName }: IntelligenceRep
                 onClick={() => toggle(i)}
                 className="w-full flex items-center gap-3 p-3 text-left hover:bg-accent transition-colors"
               >
-                <Icon className="w-4 h-4 text-naib-blue shrink-0" />
+                <Icon className="w-4 h-4 text-aci-blue shrink-0" />
                 <span className="flex-1 text-xs font-medium text-foreground">{panel.title}</span>
                 {risk && (
                   <span className={`text-[9px] font-mono font-medium uppercase tracking-wider ${risk.color} px-1.5 py-0.5 ${risk.bg} border ${risk.border}`}>
@@ -81,7 +81,7 @@ export function IntelligenceReport({ subtestResults, roleName }: IntelligenceRep
                     <ul className="mt-3 space-y-1.5">
                       {panel.keyPoints.map((point, j) => (
                         <li key={j} className="flex items-start gap-2 text-[11px] text-muted-foreground">
-                          <span className="w-1 h-1 bg-naib-gold mt-1.5 shrink-0" />
+                          <span className="w-1 h-1 bg-aci-gold mt-1.5 shrink-0" />
                           {point}
                         </li>
                       ))}
@@ -93,13 +93,13 @@ export function IntelligenceReport({ subtestResults, roleName }: IntelligenceRep
                     <div className="mt-3 pt-3 border-t border-border grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {panel.hiringAction && (
                         <div className="p-2 bg-accent/30">
-                          <p className="text-[9px] text-naib-gold uppercase tracking-wider font-medium mb-1">Hiring Action</p>
+                          <p className="text-[9px] text-aci-gold uppercase tracking-wider font-medium mb-1">Hiring Action</p>
                           <p className="text-[10px] text-muted-foreground leading-relaxed">{panel.hiringAction}</p>
                         </div>
                       )}
                       {panel.developmentNote && (
                         <div className="p-2 bg-accent/30">
-                          <p className="text-[9px] text-naib-blue uppercase tracking-wider font-medium mb-1">Development Focus</p>
+                          <p className="text-[9px] text-aci-blue uppercase tracking-wider font-medium mb-1">Development Focus</p>
                           <p className="text-[10px] text-muted-foreground leading-relaxed">{panel.developmentNote}</p>
                         </div>
                       )}

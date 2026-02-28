@@ -19,21 +19,21 @@ export default function ForgotPasswordPage() {
       title={sent ? "Check your email" : "Reset your password"}
       subtitle={sent ? "We sent a password reset link to your email" : "Enter your email and we'll send you a reset link"}
       footer={
-        <Link href="/login" className="text-naib-gold hover:text-naib-gold/80 font-medium">
+        <Link href="/login" className="text-aci-gold hover:text-aci-gold/80 font-medium">
           Back to sign in
         </Link>
       }
     >
       {sent ? (
         <div className="text-center py-4">
-          <div className="w-14 h-14 bg-naib-green/10 border border-naib-green/20 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-7 h-7 text-naib-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-14 h-14 bg-aci-green/10 border border-aci-green/20 flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-aci-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <p className="text-xs text-muted-foreground">
             Didn&apos;t receive the email? Check your spam folder or{" "}
-            <button onClick={() => setSent(false)} className="text-naib-blue hover:underline">try again</button>.
+            <button onClick={() => setSent(false)} className="text-aci-blue hover:underline">try again</button>.
           </p>
         </div>
       ) : (

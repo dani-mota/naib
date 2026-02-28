@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { IdentityCard } from "./identity-card";
 import { DecisionSummary } from "./decision-summary";
 import { SpiderChart } from "./spider-chart";
@@ -10,8 +10,9 @@ import { PredictionsGrid } from "./predictions-grid";
 import { NotesPanel } from "./notes-panel";
 import { RoleSwitcher } from "./role-switcher";
 import { InterviewGuide } from "./interview-guide";
+import { RoleMismatch } from "./role-mismatch";
 import { CONSTRUCTS, LAYER_INFO, type LayerType } from "@/lib/constructs";
-import { AlertTriangle, TrendingUp, TrendingDown, Shield, FileDown } from "lucide-react";
+import { AlertTriangle, TrendingUp, TrendingDown, Shield, FileDown, FileText, ClipboardList } from "lucide-react";
 
 interface ProfileClientProps {
   candidate: any;
@@ -105,8 +106,49 @@ function generateExecutiveSummary(
 
 export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientProps) {
   const [selectedRoleSlug, setSelectedRoleSlug] = useState(candidate.primaryRole.slug);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const previousWeightsRef = useRef<Record<string, number>>({});
 
   const selectedRole = allRoles.find((r: any) => r.slug === selectedRoleSlug) || allRoles[0];
+
+  // Compute weight diffs when role changes
+  const weightDiffs = useMemo(() => {
+    const currentWeights: Record<string, number> = {};
+    for (const w of selectedRole?.compositeWeights || []) {
+      currentWeights[w.constructId] = w.weight;
+    }
+    const diffs: Record<string, number> = {};
+    const prev = previousWeightsRef.current;
+    if (Object.keys(prev).length > 0) {
+      for (const key of Object.keys(currentWeights)) {
+        diffs[key] = (currentWeights[key] ?? 0) - (prev[key] ?? 0);
+      }
+      for (const key of Object.keys(prev)) {
+        if (!(key in diffs)) {
+          diffs[key] = -(prev[key] ?? 0);
+        }
+      }
+    }
+    return diffs;
+  }, [selectedRole]);
+
+  const handleRoleSelect = useCallback((slug: string) => {
+    // Capture current weights before switching
+    const currentWeights: Record<string, number> = {};
+    for (const w of selectedRole?.compositeWeights || []) {
+      currentWeights[w.constructId] = w.weight;
+    }
+    previousWeightsRef.current = currentWeights;
+    setSelectedRoleSlug(slug);
+    setShowAnimation(true);
+  }, [selectedRole]);
+
+  useEffect(() => {
+    if (showAnimation) {
+      const timer = setTimeout(() => setShowAnimation(false), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [showAnimation]);
   const compositeScore = candidate.assessment?.compositeScores?.find(
     (cs: any) => cs.roleSlug === selectedRoleSlug
   );
@@ -142,10 +184,34 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
                 a.download = `${candidate.firstName}_${candidate.lastName}_Scorecard.pdf`;
                 a.click();
               }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-naib-gold border border-naib-gold/30 hover:bg-naib-gold/10 transition-colors"
+              className="flex items-center gap-2 w-full px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-aci-gold border border-aci-gold/30 hover:bg-aci-gold/10 transition-colors"
             >
               <FileDown className="w-3.5 h-3.5" />
               Export PDF Scorecard
+            </button>
+            <button
+              onClick={() => {
+                const a = document.createElement("a");
+                a.href = `/api/export/pdf/${candidate.id}/one-pager`;
+                a.download = `${candidate.firstName}_${candidate.lastName}_OnePager.pdf`;
+                a.click();
+              }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-aci-gold border border-aci-gold/30 hover:bg-aci-gold/10 transition-colors mt-2"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              HM One-Pager
+            </button>
+            <button
+              onClick={() => {
+                const a = document.createElement("a");
+                a.href = `/api/export/pdf/${candidate.id}/interview-kit`;
+                a.download = `${candidate.firstName}_${candidate.lastName}_InterviewKit.pdf`;
+                a.click();
+              }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-aci-gold border border-aci-gold/30 hover:bg-aci-gold/10 transition-colors mt-2"
+            >
+              <ClipboardList className="w-3.5 h-3.5" />
+              Interview Kit PDF
             </button>
           </div>
         </div>
@@ -165,7 +231,7 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
                 <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-medium">Composite</p>
               </div>
               <div className="flex-1">
-                <p className={`text-xs font-semibold uppercase tracking-wider ${summary.passed ? "text-naib-green" : "text-naib-amber"}`}>
+                <p className={`text-xs font-semibold uppercase tracking-wider ${summary.passed ? "text-aci-green" : "text-aci-amber"}`}>
                   {summary.passed ? "Meets Cutline Thresholds" : `${summary.distance} Points from Cutline`}
                 </p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">
@@ -173,9 +239,9 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
                 </p>
               </div>
               {summary.redFlagCount > 0 && (
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-naib-red/5 border border-naib-red/20">
-                  <AlertTriangle className="w-3.5 h-3.5 text-naib-red" />
-                  <span className="text-[10px] font-mono font-medium text-naib-red uppercase">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-aci-red/5 border border-aci-red/20">
+                  <AlertTriangle className="w-3.5 h-3.5 text-aci-red" />
+                  <span className="text-[10px] font-mono font-medium text-aci-red uppercase">
                     {summary.redFlagCount} Flag{summary.redFlagCount > 1 ? "s" : ""}
                   </span>
                 </div>
@@ -204,8 +270,8 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               <div className="p-3 bg-accent/30 border border-border">
                 <div className="flex items-center gap-1.5 mb-2">
-                  <TrendingUp className="w-3.5 h-3.5 text-naib-green" />
-                  <p className="text-[9px] text-naib-green uppercase tracking-wider font-semibold">Top Strengths</p>
+                  <TrendingUp className="w-3.5 h-3.5 text-aci-green" />
+                  <p className="text-[9px] text-aci-green uppercase tracking-wider font-semibold">Top Strengths</p>
                 </div>
                 <div className="space-y-1.5">
                   {summary.strengths.map((s) => (
@@ -221,8 +287,8 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
               </div>
               <div className="p-3 bg-accent/30 border border-border">
                 <div className="flex items-center gap-1.5 mb-2">
-                  <TrendingDown className="w-3.5 h-3.5 text-naib-amber" />
-                  <p className="text-[9px] text-naib-amber uppercase tracking-wider font-semibold">Development Areas</p>
+                  <TrendingDown className="w-3.5 h-3.5 text-aci-amber" />
+                  <p className="text-[9px] text-aci-amber uppercase tracking-wider font-semibold">Development Areas</p>
                 </div>
                 <div className="space-y-1.5">
                   {summary.devAreas.map((d) => (
@@ -241,8 +307,8 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
             {/* Key insight */}
             <div className="p-3 bg-accent/30 border border-border">
               <div className="flex items-center gap-1.5 mb-1.5">
-                <Shield className="w-3.5 h-3.5 text-naib-gold" />
-                <p className="text-[9px] text-naib-gold uppercase tracking-wider font-semibold">Key Insight</p>
+                <Shield className="w-3.5 h-3.5 text-aci-gold" />
+                <p className="text-[9px] text-aci-gold uppercase tracking-wider font-semibold">Key Insight</p>
               </div>
               <p className="text-[11px] text-muted-foreground leading-relaxed">{summary.keyInsight}</p>
             </div>
@@ -253,6 +319,8 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
             roleWeights={selectedRole?.compositeWeights || []}
             cutline={cutline}
             roleSlug={selectedRoleSlug}
+            weightDiffs={weightDiffs}
+            showAnimation={showAnimation}
           />
 
           <IntelligenceReport
@@ -276,8 +344,15 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
           <RoleSwitcher
             roles={allRoles}
             selectedSlug={selectedRoleSlug}
-            onSelect={setSelectedRoleSlug}
+            onSelect={handleRoleSelect}
             compositeScores={candidate.assessment?.compositeScores || []}
+          />
+          <RoleMismatch
+            compositeScores={candidate.assessment?.compositeScores || []}
+            primaryRoleSlug={candidate.primaryRole.slug}
+            candidateStatus={candidate.status}
+            roles={allRoles}
+            onSelect={handleRoleSelect}
           />
           <InterviewGuide
             subtestResults={subtestResults}

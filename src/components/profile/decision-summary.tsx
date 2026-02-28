@@ -18,7 +18,9 @@ export function DecisionSummary({ candidate, compositeScore, roleName }: Decisio
     <div className="bg-card border border-border p-4 space-y-3">
       <div>
         <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1.5">Decision</p>
-        <StatusBadge status={candidate.status} />
+        <div className="transition-all duration-300">
+          <StatusBadge status={candidate.status} />
+        </div>
       </div>
 
       <div>
@@ -42,7 +44,7 @@ export function DecisionSummary({ candidate, compositeScore, roleName }: Decisio
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1.5">Flags</p>
           {redFlags.map((flag: any) => (
             <div key={flag.id} className={`flex items-start gap-2 text-[11px] p-2 mb-1 border ${
-              flag.severity === "CRITICAL" ? "bg-naib-red/5 border-naib-red/20 text-naib-red" : flag.severity === "WARNING" ? "bg-naib-amber/5 border-naib-amber/20 text-naib-amber" : "bg-naib-blue/5 border-naib-blue/20 text-naib-blue"
+              flag.severity === "CRITICAL" ? "bg-aci-red/5 border-aci-red/20 text-aci-red" : flag.severity === "WARNING" ? "bg-aci-amber/5 border-aci-amber/20 text-aci-amber" : "bg-aci-blue/5 border-aci-blue/20 text-aci-blue"
             }`}>
               <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
               <span>{flag.title}</span>

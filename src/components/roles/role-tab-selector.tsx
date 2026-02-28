@@ -21,7 +21,7 @@ export function RoleTabSelector({ roles, currentSlug }: RoleTabSelectorProps) {
                 href={`/roles/${role.slug}`}
                 className={`px-4 py-3 text-[11px] font-medium uppercase tracking-wider transition-colors border-b-2 ${
                   isActive
-                    ? "text-naib-gold border-naib-gold bg-naib-gold/5"
+                    ? "text-aci-gold border-aci-gold bg-aci-gold/5"
                     : "text-muted-foreground border-transparent hover:text-foreground hover:bg-accent/50"
                 }`}
               >

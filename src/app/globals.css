@@ -6,15 +6,15 @@
 
 @theme inline {
   /* ── ACI Brand Colors ── */
-  --color-naib-navy: #0F1729;
-  --color-naib-blue: #2563EB;
-  --color-naib-green: #059669;
-  --color-naib-amber: #D97706;
-  --color-naib-red-muted: #9B1C1C;
-  --color-naib-red: #DC2626;
-  --color-naib-slate: #64748B;
-  --color-naib-surface: #F8FAFC;
-  --color-naib-gold: #C9A84C;
+  --color-aci-navy: #0F1729;
+  --color-aci-blue: #2563EB;
+  --color-aci-green: #059669;
+  --color-aci-amber: #D97706;
+  --color-aci-red-muted: #9B1C1C;
+  --color-aci-red: #DC2626;
+  --color-aci-slate: #64748B;
+  --color-aci-surface: #F8FAFC;
+  --color-aci-gold: #C9A84C;
 
   /* Heatmap 5-tier */
   --color-heat-exceptional: #065F46;
@@ -157,6 +157,36 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
   }
+}
+
+/* ── Role-switch pulse animations ── */
+@keyframes pulseGreen {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+  50% { box-shadow: 0 0 8px 4px rgba(5, 150, 105, 0.4); }
+}
+@keyframes pulseAmber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+  50% { box-shadow: 0 0 8px 4px rgba(217, 119, 6, 0.4); }
+}
+@keyframes pulseGreenText {
+  0%, 100% { color: inherit; }
+  50% { color: #059669; }
+}
+@keyframes pulseAmberText {
+  0%, 100% { color: inherit; }
+  50% { color: #D97706; }
+}
+.animate-pulse-green {
+  animation: pulseGreen 600ms ease-in-out;
+}
+.animate-pulse-amber {
+  animation: pulseAmber 600ms ease-in-out;
+}
+.animate-pulse-green-text {
+  animation: pulseGreenText 600ms ease-in-out 2;
+}
+.animate-pulse-amber-text {
+  animation: pulseAmberText 600ms ease-in-out 2;
 }
 
 /* ── Recharts focus/outline suppression ── */

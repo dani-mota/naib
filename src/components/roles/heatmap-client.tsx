@@ -192,7 +192,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
           {selectedIds.size >= 2 && (
             <button
               onClick={handleCompare}
-              className="px-3 py-1.5 bg-naib-gold text-naib-navy text-[10px] font-semibold uppercase tracking-wider hover:bg-naib-gold/90 transition-colors"
+              className="px-3 py-1.5 bg-aci-gold text-aci-navy text-[10px] font-semibold uppercase tracking-wider hover:bg-aci-gold/90 transition-colors"
             >
               Compare ({selectedIds.size})
             </button>
@@ -222,7 +222,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
           </select>
           <Link
             href={`/roles/${selectedRoleSlug}`}
-            className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-wider text-naib-gold border border-naib-gold/30 hover:bg-naib-gold/10 transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-wider text-aci-gold border border-aci-gold/30 hover:bg-aci-gold/10 transition-colors"
           >
             Role Profile
             <ArrowRight className="w-3 h-3" />
@@ -254,7 +254,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                 return (
                   <th
                     key={key}
-                    className={`py-1.5 px-0 text-center font-medium w-[34px] cursor-pointer hover:bg-accent/30 select-none ${isHighWeight ? "border-l-2 border-l-naib-gold" : ""}`}
+                    className={`py-1.5 px-0 text-center font-medium w-[34px] cursor-pointer hover:bg-accent/30 select-none ${isHighWeight ? "border-l-2 border-l-aci-gold" : ""}`}
                     style={{ borderTop: `2px solid ${layerInfo.color}` }}
                     onClick={() => handleSort(key)}
                     onMouseEnter={(e) => {
@@ -286,8 +286,8 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                         className="py-0 px-0 h-[18px] relative"
                         style={{ borderBottom: "none" }}
                       >
-                        <div className="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-naib-red/60" />
-                        <span className="absolute left-2 top-1/2 -translate-y-1/2 bg-card px-1.5 text-[8px] font-semibold uppercase tracking-wider text-naib-red/80">
+                        <div className="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-aci-red/60" />
+                        <span className="absolute left-2 top-1/2 -translate-y-1/2 bg-card px-1.5 text-[8px] font-semibold uppercase tracking-wider text-aci-red/80">
                           Minimum threshold
                         </span>
                       </td>
@@ -308,7 +308,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                     <td className="sticky left-7 bg-card py-0 px-1.5">
                       <Link
                         href={`/candidates/${row.id}`}
-                        className="text-[10px] font-medium text-foreground hover:text-naib-gold transition-colors"
+                        className="text-[10px] font-medium text-foreground hover:text-aci-gold transition-colors"
                       >
                         {row.name}
                       </Link>
@@ -330,7 +330,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                       return (
                         <td
                           key={key}
-                          className={`py-0 px-0 text-center ${isHighWeight ? "border-l-2 border-l-naib-gold/30" : ""}`}
+                          className={`py-0 px-0 text-center ${isHighWeight ? "border-l-2 border-l-aci-gold/30" : ""}`}
                           onMouseEnter={(e) => {
                             setHoveredCell({ key, val, x: e.clientX, y: e.clientY });
                           }}
@@ -426,7 +426,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
               animation: "heatmapFadeIn 120ms ease-out",
             }}
           >
-            <p className="text-[10px] font-semibold text-naib-red/90 uppercase tracking-wider mb-2">
+            <p className="text-[10px] font-semibold text-aci-red/90 uppercase tracking-wider mb-2">
               {selectedRole?.name} Threshold
             </p>
             <p className="text-[10px] text-muted-foreground leading-relaxed mb-3">
@@ -491,8 +491,8 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
           ))}
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-0.5 border-t-2 border-dashed border-naib-red/60" />
-          <span className="uppercase tracking-wider text-naib-red/80">Minimum Threshold</span>
+          <div className="w-4 h-0.5 border-t-2 border-dashed border-aci-red/60" />
+          <span className="uppercase tracking-wider text-aci-red/80">Minimum Threshold</span>
         </div>
       </div>
     </div>

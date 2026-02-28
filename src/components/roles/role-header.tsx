@@ -14,10 +14,10 @@ interface RoleHeaderProps {
 }
 
 const STAT_CARDS = [
-  { key: "totalAssessed", label: "Total Assessed", Icon: Users, color: "text-naib-blue" },
-  { key: "strongFit", label: "Strong Fit", Icon: CheckCircle, color: "text-naib-green" },
-  { key: "avgComposite", label: "Avg Composite", Icon: BarChart3, color: "text-naib-gold" },
-  { key: "reviewCount", label: "Needs Review", Icon: AlertTriangle, color: "text-naib-amber" },
+  { key: "totalAssessed", label: "Total Assessed", Icon: Users, color: "text-aci-blue" },
+  { key: "strongFit", label: "Strong Fit", Icon: CheckCircle, color: "text-aci-green" },
+  { key: "avgComposite", label: "Avg Composite", Icon: BarChart3, color: "text-aci-gold" },
+  { key: "reviewCount", label: "Needs Review", Icon: AlertTriangle, color: "text-aci-amber" },
 ] as const;
 
 export function RoleHeader({ role, stats }: RoleHeaderProps) {

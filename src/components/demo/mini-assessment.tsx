@@ -82,7 +82,7 @@ export function MiniAssessment({ onComplete }: MiniAssessmentProps) {
   };
 
   return (
-    <div className="min-h-screen bg-naib-navy flex items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-aci-navy flex items-center justify-center p-4 relative">
       <AnimatedGrid />
 
       <div className="w-full max-w-2xl relative z-10">
@@ -96,7 +96,7 @@ export function MiniAssessment({ onComplete }: MiniAssessmentProps) {
               <div
                 key={i}
                 className={`h-1 w-8 transition-colors ${
-                  i <= current ? "bg-naib-gold" : "bg-white/20"
+                  i <= current ? "bg-aci-gold" : "bg-white/20"
                 }`}
               />
             ))}
@@ -106,7 +106,7 @@ export function MiniAssessment({ onComplete }: MiniAssessmentProps) {
         {/* Card */}
         <div className="bg-card border border-border shadow-lg p-8">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] px-2 py-0.5 bg-naib-blue/10 text-naib-blue font-medium font-mono uppercase tracking-wider">
+            <span className="text-[10px] px-2 py-0.5 bg-aci-blue/10 text-aci-blue font-medium font-mono uppercase tracking-wider">
               {question.title}
             </span>
           </div>
@@ -122,7 +122,7 @@ export function MiniAssessment({ onComplete }: MiniAssessmentProps) {
                 onClick={() => setSelected(option.value)}
                 className={`w-full text-left p-3 border-2 transition-all ${
                   selected === option.value
-                    ? "border-naib-gold bg-naib-gold/5"
+                    ? "border-aci-gold bg-aci-gold/5"
                     : "border-border hover:border-muted-foreground/30"
                 }`}
               >

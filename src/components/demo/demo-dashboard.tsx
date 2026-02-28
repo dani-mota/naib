@@ -61,7 +61,7 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Demo Banner */}
-      <div className="bg-naib-gold text-naib-navy text-center py-2 px-4 text-xs font-medium uppercase tracking-wider">
+      <div className="bg-aci-gold text-aci-navy text-center py-2 px-4 text-xs font-medium uppercase tracking-wider">
         You&apos;re viewing the interactive demo.{" "}
         <Link href="/signup" className="underline font-bold">Create an account</Link> to assess your real candidates.
       </div>
@@ -120,7 +120,7 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
               <div className="space-y-2">
                 {strengths.map((name) => (
                   <div key={name} className="flex items-center gap-2 text-xs">
-                    <div className="w-2 h-2 bg-naib-green" />
+                    <div className="w-2 h-2 bg-aci-green" />
                     <span className="text-foreground">{name}</span>
                   </div>
                 ))}
@@ -132,7 +132,7 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
               <div className="space-y-2">
                 {devAreas.map((name) => (
                   <div key={name} className="flex items-center gap-2 text-xs">
-                    <div className="w-2 h-2 bg-naib-amber" />
+                    <div className="w-2 h-2 bg-aci-amber" />
                     <span className="text-foreground">{name}</span>
                   </div>
                 ))}
@@ -157,7 +157,7 @@ export function DemoDashboard({ answers }: DemoDashboardProps) {
         </div>
 
         {/* CTA */}
-        <div className="bg-naib-navy p-8 text-center">
+        <div className="bg-aci-navy p-8 text-center">
           <h2 className="text-xl font-bold text-white mb-2 tracking-wider" style={{ fontFamily: "var(--font-dm-sans)" }}>
             Ready to assess your real candidates?
           </h2>

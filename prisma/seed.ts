@@ -25,52 +25,53 @@ const CONSTRUCTS = [
 
 type ConstructId = (typeof CONSTRUCTS)[number]["id"];
 
-// ─── ROLE COMPOSITE WEIGHTS (from PRD Section 4) ─────────
+// ─── ROLE COMPOSITE WEIGHTS (from PRD Section 6.4) ───────
+// Values are PRD weights × 100 (e.g., 0.22 → 22). Sum = 100 per role.
 const ROLE_WEIGHTS: Record<string, Record<ConstructId, number>> = {
   "factory-technician": {
-    FLUID_REASONING: 6, EXECUTIVE_CONTROL: 8, COGNITIVE_FLEXIBILITY: 5,
-    METACOGNITIVE_CALIBRATION: 7, LEARNING_VELOCITY: 12,
-    SYSTEMS_DIAGNOSTICS: 8, PATTERN_RECOGNITION: 7, QUANTITATIVE_REASONING: 5,
-    SPATIAL_VISUALIZATION: 6, MECHANICAL_REASONING: 10,
-    PROCEDURAL_RELIABILITY: 14, ETHICAL_JUDGMENT: 12,
+    FLUID_REASONING: 10, EXECUTIVE_CONTROL: 10, COGNITIVE_FLEXIBILITY: 5,
+    METACOGNITIVE_CALIBRATION: 8, LEARNING_VELOCITY: 22,
+    SYSTEMS_DIAGNOSTICS: 3, PATTERN_RECOGNITION: 7, QUANTITATIVE_REASONING: 5,
+    SPATIAL_VISUALIZATION: 2, MECHANICAL_REASONING: 3,
+    PROCEDURAL_RELIABILITY: 20, ETHICAL_JUDGMENT: 5,
   },
   "cnc-machinist": {
-    FLUID_REASONING: 8, EXECUTIVE_CONTROL: 10, COGNITIVE_FLEXIBILITY: 6,
-    METACOGNITIVE_CALIBRATION: 8, LEARNING_VELOCITY: 10,
-    SYSTEMS_DIAGNOSTICS: 10, PATTERN_RECOGNITION: 8, QUANTITATIVE_REASONING: 10,
-    SPATIAL_VISUALIZATION: 8, MECHANICAL_REASONING: 8,
-    PROCEDURAL_RELIABILITY: 8, ETHICAL_JUDGMENT: 6,
+    FLUID_REASONING: 8, EXECUTIVE_CONTROL: 10, COGNITIVE_FLEXIBILITY: 8,
+    METACOGNITIVE_CALIBRATION: 5, LEARNING_VELOCITY: 8,
+    SYSTEMS_DIAGNOSTICS: 5, PATTERN_RECOGNITION: 12, QUANTITATIVE_REASONING: 15,
+    SPATIAL_VISUALIZATION: 15, MECHANICAL_REASONING: 12,
+    PROCEDURAL_RELIABILITY: 2, ETHICAL_JUDGMENT: 0,
   },
   "cam-programmer": {
-    FLUID_REASONING: 12, EXECUTIVE_CONTROL: 6, COGNITIVE_FLEXIBILITY: 10,
-    METACOGNITIVE_CALIBRATION: 8, LEARNING_VELOCITY: 10,
-    SYSTEMS_DIAGNOSTICS: 8, PATTERN_RECOGNITION: 10, QUANTITATIVE_REASONING: 8,
-    SPATIAL_VISUALIZATION: 14, MECHANICAL_REASONING: 6,
-    PROCEDURAL_RELIABILITY: 4, ETHICAL_JUDGMENT: 4,
+    FLUID_REASONING: 15, EXECUTIVE_CONTROL: 8, COGNITIVE_FLEXIBILITY: 5,
+    METACOGNITIVE_CALIBRATION: 5, LEARNING_VELOCITY: 7,
+    SYSTEMS_DIAGNOSTICS: 10, PATTERN_RECOGNITION: 5, QUANTITATIVE_REASONING: 18,
+    SPATIAL_VISUALIZATION: 20, MECHANICAL_REASONING: 5,
+    PROCEDURAL_RELIABILITY: 0, ETHICAL_JUDGMENT: 2,
   },
   "cmm-programmer": {
-    FLUID_REASONING: 8, EXECUTIVE_CONTROL: 10, COGNITIVE_FLEXIBILITY: 6,
-    METACOGNITIVE_CALIBRATION: 10, LEARNING_VELOCITY: 8,
-    SYSTEMS_DIAGNOSTICS: 8, PATTERN_RECOGNITION: 12, QUANTITATIVE_REASONING: 14,
-    SPATIAL_VISUALIZATION: 8, MECHANICAL_REASONING: 4,
-    PROCEDURAL_RELIABILITY: 8, ETHICAL_JUDGMENT: 4,
+    FLUID_REASONING: 10, EXECUTIVE_CONTROL: 10, COGNITIVE_FLEXIBILITY: 5,
+    METACOGNITIVE_CALIBRATION: 8, LEARNING_VELOCITY: 5,
+    SYSTEMS_DIAGNOSTICS: 5, PATTERN_RECOGNITION: 15, QUANTITATIVE_REASONING: 20,
+    SPATIAL_VISUALIZATION: 5, MECHANICAL_REASONING: 2,
+    PROCEDURAL_RELIABILITY: 12, ETHICAL_JUDGMENT: 3,
   },
   "manufacturing-engineer": {
-    FLUID_REASONING: 14, EXECUTIVE_CONTROL: 6, COGNITIVE_FLEXIBILITY: 10,
-    METACOGNITIVE_CALIBRATION: 8, LEARNING_VELOCITY: 10,
-    SYSTEMS_DIAGNOSTICS: 14, PATTERN_RECOGNITION: 8, QUANTITATIVE_REASONING: 10,
-    SPATIAL_VISUALIZATION: 6, MECHANICAL_REASONING: 6,
-    PROCEDURAL_RELIABILITY: 4, ETHICAL_JUDGMENT: 4,
+    FLUID_REASONING: 18, EXECUTIVE_CONTROL: 5, COGNITIVE_FLEXIBILITY: 8,
+    METACOGNITIVE_CALIBRATION: 8, LEARNING_VELOCITY: 12,
+    SYSTEMS_DIAGNOSTICS: 18, PATTERN_RECOGNITION: 5, QUANTITATIVE_REASONING: 8,
+    SPATIAL_VISUALIZATION: 5, MECHANICAL_REASONING: 3,
+    PROCEDURAL_RELIABILITY: 3, ETHICAL_JUDGMENT: 7,
   },
 };
 
-// ─── CUTLINES (minimum percentile thresholds) ────────────
+// ─── CUTLINES (minimum percentile thresholds, PRD Section 6.5) ─
 const CUTLINES: Record<string, { tech: number; behav: number; lv: number }> = {
-  "factory-technician": { tech: 35, behav: 50, lv: 40 },
-  "cnc-machinist": { tech: 50, behav: 40, lv: 45 },
-  "cam-programmer": { tech: 60, behav: 30, lv: 50 },
-  "cmm-programmer": { tech: 55, behav: 35, lv: 45 },
-  "manufacturing-engineer": { tech: 60, behav: 35, lv: 55 },
+  "factory-technician": { tech: 40, behav: 60, lv: 60 },
+  "cnc-machinist": { tech: 60, behav: 55, lv: 50 },
+  "cam-programmer": { tech: 75, behav: 50, lv: 55 },
+  "cmm-programmer": { tech: 70, behav: 75, lv: 45 },
+  "manufacturing-engineer": { tech: 65, behav: 70, lv: 65 },
 };
 
 // ─── CANDIDATE ARCHETYPES ────────────────────────────────
@@ -100,17 +101,17 @@ const ARCHETYPES: Archetype[] = [
       METACOGNITIVE_CALIBRATION: [45, 65], LEARNING_VELOCITY: [65, 82],
       SYSTEMS_DIAGNOSTICS: [80, 95], PATTERN_RECOGNITION: [75, 92], QUANTITATIVE_REASONING: [82, 97],
       SPATIAL_VISUALIZATION: [78, 95], MECHANICAL_REASONING: [80, 96],
-      PROCEDURAL_RELIABILITY: [40, 60], ETHICAL_JUDGMENT: [35, 55],
+      PROCEDURAL_RELIABILITY: [55, 72], ETHICAL_JUDGMENT: [50, 68],
     },
-    flagProbability: 0.2,
+    flagProbability: 0.15,
   },
   {
     name: "Steady Hand",
     scores: {
       FLUID_REASONING: [45, 62], EXECUTIVE_CONTROL: [65, 82], COGNITIVE_FLEXIBILITY: [40, 58],
-      METACOGNITIVE_CALIBRATION: [70, 88], LEARNING_VELOCITY: [45, 60],
-      SYSTEMS_DIAGNOSTICS: [50, 68], PATTERN_RECOGNITION: [48, 65], QUANTITATIVE_REASONING: [50, 68],
-      SPATIAL_VISUALIZATION: [45, 62], MECHANICAL_REASONING: [55, 72],
+      METACOGNITIVE_CALIBRATION: [70, 88], LEARNING_VELOCITY: [58, 72],
+      SYSTEMS_DIAGNOSTICS: [55, 72], PATTERN_RECOGNITION: [52, 68], QUANTITATIVE_REASONING: [55, 72],
+      SPATIAL_VISUALIZATION: [50, 66], MECHANICAL_REASONING: [58, 75],
       PROCEDURAL_RELIABILITY: [82, 97], ETHICAL_JUDGMENT: [80, 96],
     },
     flagProbability: 0.05,
@@ -120,9 +121,9 @@ const ARCHETYPES: Archetype[] = [
     scores: {
       FLUID_REASONING: [72, 90], EXECUTIVE_CONTROL: [55, 72], COGNITIVE_FLEXIBILITY: [70, 88],
       METACOGNITIVE_CALIBRATION: [60, 78], LEARNING_VELOCITY: [85, 98],
-      SYSTEMS_DIAGNOSTICS: [50, 68], PATTERN_RECOGNITION: [55, 72], QUANTITATIVE_REASONING: [52, 70],
-      SPATIAL_VISUALIZATION: [55, 72], MECHANICAL_REASONING: [48, 65],
-      PROCEDURAL_RELIABILITY: [50, 68], ETHICAL_JUDGMENT: [55, 72],
+      SYSTEMS_DIAGNOSTICS: [58, 75], PATTERN_RECOGNITION: [60, 78], QUANTITATIVE_REASONING: [58, 75],
+      SPATIAL_VISUALIZATION: [60, 78], MECHANICAL_REASONING: [55, 72],
+      PROCEDURAL_RELIABILITY: [55, 72], ETHICAL_JUDGMENT: [58, 75],
     },
     flagProbability: 0.1,
   },
@@ -142,17 +143,17 @@ const ARCHETYPES: Archetype[] = [
     scores: {
       FLUID_REASONING: [60, 80], EXECUTIVE_CONTROL: [35, 52], COGNITIVE_FLEXIBILITY: [65, 82],
       METACOGNITIVE_CALIBRATION: [30, 48], LEARNING_VELOCITY: [70, 88],
-      SYSTEMS_DIAGNOSTICS: [40, 58], PATTERN_RECOGNITION: [45, 62], QUANTITATIVE_REASONING: [38, 55],
-      SPATIAL_VISUALIZATION: [42, 60], MECHANICAL_REASONING: [35, 52],
-      PROCEDURAL_RELIABILITY: [30, 48], ETHICAL_JUDGMENT: [55, 72],
+      SYSTEMS_DIAGNOSTICS: [48, 65], PATTERN_RECOGNITION: [50, 68], QUANTITATIVE_REASONING: [45, 62],
+      SPATIAL_VISUALIZATION: [48, 65], MECHANICAL_REASONING: [42, 58],
+      PROCEDURAL_RELIABILITY: [45, 62], ETHICAL_JUDGMENT: [55, 72],
     },
-    flagProbability: 0.3,
+    flagProbability: 0.25,
   },
   {
     name: "Veteran Profile",
     scores: {
       FLUID_REASONING: [42, 58], EXECUTIVE_CONTROL: [70, 88], COGNITIVE_FLEXIBILITY: [35, 52],
-      METACOGNITIVE_CALIBRATION: [65, 82], LEARNING_VELOCITY: [35, 50],
+      METACOGNITIVE_CALIBRATION: [65, 82], LEARNING_VELOCITY: [48, 65],
       SYSTEMS_DIAGNOSTICS: [72, 90], PATTERN_RECOGNITION: [70, 88], QUANTITATIVE_REASONING: [68, 85],
       SPATIAL_VISUALIZATION: [65, 82], MECHANICAL_REASONING: [75, 92],
       PROCEDURAL_RELIABILITY: [78, 95], ETHICAL_JUDGMENT: [72, 90],
@@ -200,6 +201,12 @@ const CANDIDATES = [
   { first: "Jordan", last: "Brooks", email: "j.brooks", archetype: 7, role: 0 },
   { first: "Samira", last: "Al-Rashid", email: "s.alrashid", archetype: 3, role: 3 },
 ];
+
+// Candidates that should be INCOMPLETE (assessment started but not finished)
+const INCOMPLETE_CANDIDATES = new Set(["n.volkov", "a.kim", "j.brooks"]);
+
+// Candidates that must have CRITICAL red flags (passes composite but integrity issue)
+const FORCED_RED_FLAG_CANDIDATES = new Set(["t.rizzo", "d.washington"]);
 
 const ROLE_SLUGS = ["factory-technician", "cnc-machinist", "cam-programmer", "cmm-programmer", "manufacturing-engineer"];
 const ROLE_NAMES = ["Factory Technician", "CNC Machinist", "CAM Programmer", "CMM Programmer", "Manufacturing Engineer"];
@@ -342,7 +349,7 @@ function randomDate(daysAgo: number): Date {
 
 // ─── MAIN SEED ───────────────────────────────────────────
 async function main() {
-  console.log("🌱 Seeding NAIB database...");
+  console.log("🌱 Seeding ACI database...");
 
   // Clean existing data
   await prisma.activityLog.deleteMany();
@@ -371,7 +378,7 @@ async function main() {
   // 2. User
   const user = await prisma.user.create({
     data: {
-      email: "alex.chen@naib.io",
+      email: "alex.chen@arklight.io",
       name: "Alex Chen",
       role: "TA_LEADER",
       orgId: org.id,
@@ -431,15 +438,17 @@ async function main() {
     const archetype = ARCHETYPES[cand.archetype];
     const primaryRoleSlug = ROLE_SLUGS[cand.role];
     const scores = generateScores(archetype);
+    const isIncomplete = INCOMPLETE_CANDIDATES.has(cand.email);
+    const hasForcedRedFlag = FORCED_RED_FLAG_CANDIDATES.has(cand.email);
 
     // Determine status for primary role
     const { passed, distance } = evaluateCutline(scores, primaryRoleSlug);
-    const hasRedFlag = Math.random() < archetype.flagProbability;
-    const status = determineStatus(passed, distance, hasRedFlag);
+    const hasRedFlag = hasForcedRedFlag || Math.random() < archetype.flagProbability;
+    const status = isIncomplete ? "INCOMPLETE" : determineStatus(passed, distance, hasRedFlag);
 
     const assessmentDate = randomDate(60);
-    const completedDate = new Date(assessmentDate.getTime() + rand(35, 75) * 60000);
-    const durationMinutes = Math.round((completedDate.getTime() - assessmentDate.getTime()) / 60000);
+    const completedDate = isIncomplete ? null : new Date(assessmentDate.getTime() + rand(35, 75) * 60000);
+    const durationMinutes = completedDate ? Math.round((completedDate.getTime() - assessmentDate.getTime()) / 60000) : null;
 
     const candidate = await prisma.candidate.create({
       data: {
@@ -449,7 +458,7 @@ async function main() {
         phone: `+1${rand(200, 999)}${rand(100, 999)}${rand(1000, 9999)}`,
         orgId: org.id,
         primaryRoleId: roleRecords[primaryRoleSlug],
-        status: status as "RECOMMENDED" | "REVIEW_REQUIRED" | "DO_NOT_ADVANCE",
+        status: status as "RECOMMENDED" | "REVIEW_REQUIRED" | "DO_NOT_ADVANCE" | "INCOMPLETE",
       },
     });
 
@@ -462,6 +471,13 @@ async function main() {
         durationMinutes,
       },
     });
+
+    // Skip scoring data for incomplete assessments
+    if (isIncomplete) {
+      candidateCount++;
+      console.log(`  [${candidateCount}/25] Created ${cand.first} ${cand.last} (${archetype.name}) → INCOMPLETE`);
+      continue;
+    }
 
     // Subtest Results
     for (const c of CONSTRUCTS) {
@@ -533,6 +549,21 @@ async function main() {
 
     // Red Flags
     if (hasRedFlag) {
+      if (hasForcedRedFlag) {
+        // Forced red flag candidates always get a CRITICAL flag
+        const criticalTemplates = RED_FLAG_TEMPLATES.filter(t => t.severity === "CRITICAL");
+        const template = criticalTemplates[rand(0, criticalTemplates.length - 1)];
+        await prisma.redFlag.create({
+          data: {
+            assessmentId: assessment.id,
+            severity: "CRITICAL",
+            category: template.category,
+            title: template.title,
+            description: template.description,
+            constructs: template.constructs,
+          },
+        });
+      }
       const flagCount = rand(1, 2);
       const usedIndices = new Set<number>();
       for (let f = 0; f < flagCount; f++) {
@@ -582,7 +613,7 @@ async function main() {
 
     // Notes (1-2 per candidate)
     const noteTemplates = [
-      `${cand.first} completed the assessment ${durationMinutes < 45 ? "quickly" : "at a steady pace"}. ${status === "RECOMMENDED" ? "Strong candidate for next round." : status === "REVIEW_REQUIRED" ? "Borderline — needs hiring manager discussion." : "Significant concerns noted."}`,
+      `${cand.first} completed the assessment ${durationMinutes! < 45 ? "quickly" : "at a steady pace"}. ${status === "RECOMMENDED" ? "Strong candidate for next round." : status === "REVIEW_REQUIRED" ? "Borderline — needs hiring manager discussion." : "Significant concerns noted."}`,
       `Initial phone screen was positive. ${cand.first} has ${rand(2, 15)} years of manufacturing experience. ${archetype.name === "Star" ? "Very promising." : archetype.name === "Concern" ? "Skills may not match role requirements." : "Worth evaluating further."}`,
       `Referred by current employee. Background check in progress.`,
     ];

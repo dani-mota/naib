@@ -111,7 +111,7 @@ export function NotesPanel({ notes: initialNotes, candidateId }: NotesPanelProps
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
             placeholder="Add a note..."
-            className="flex-1 bg-accent border border-border px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-naib-gold/50"
+            className="flex-1 bg-accent border border-border px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-aci-gold/50"
             rows={2}
             onKeyDown={(e) => {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleAdd();
@@ -120,7 +120,7 @@ export function NotesPanel({ notes: initialNotes, candidateId }: NotesPanelProps
           <button
             onClick={handleAdd}
             disabled={!newContent.trim() || submitting}
-            className="self-end px-3 py-2 bg-naib-gold text-naib-navy text-[10px] font-semibold uppercase tracking-wider hover:bg-naib-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="self-end px-3 py-2 bg-aci-gold text-aci-navy text-[10px] font-semibold uppercase tracking-wider hover:bg-aci-gold/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="w-3 h-3" />
           </button>
@@ -153,7 +153,7 @@ export function NotesPanel({ notes: initialNotes, candidateId }: NotesPanelProps
                   </button>
                   <button
                     onClick={() => handleDelete(note.id)}
-                    className="p-1 text-muted-foreground hover:text-naib-red transition-colors"
+                    className="p-1 text-muted-foreground hover:text-aci-red transition-colors"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -165,14 +165,14 @@ export function NotesPanel({ notes: initialNotes, candidateId }: NotesPanelProps
                   <textarea
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
-                    className="flex-1 bg-accent border border-border px-3 py-2 text-xs text-foreground resize-none focus:outline-none focus:ring-1 focus:ring-naib-gold/50"
+                    className="flex-1 bg-accent border border-border px-3 py-2 text-xs text-foreground resize-none focus:outline-none focus:ring-1 focus:ring-aci-gold/50"
                     rows={2}
                   />
                   <div className="flex flex-col gap-1 self-end">
                     <button
                       onClick={() => handleEdit(note.id)}
                       disabled={!editContent.trim() || submitting}
-                      className="px-2 py-1 bg-naib-gold text-naib-navy text-[9px] font-semibold uppercase hover:bg-naib-gold/90 transition-colors disabled:opacity-50"
+                      className="px-2 py-1 bg-aci-gold text-aci-navy text-[9px] font-semibold uppercase hover:bg-aci-gold/90 transition-colors disabled:opacity-50"
                     >
                       Save
                     </button>

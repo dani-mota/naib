@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { PipelineCards } from "@/components/dashboard/pipeline-cards";
 import { QuickStats } from "@/components/dashboard/quick-stats";
 import { CandidateTable } from "@/components/dashboard/candidate-table";
+import { AttentionItems } from "@/components/dashboard/attention-items";
 
 async function getDashboardData() {
   const [candidates, roles] = await Promise.all([
@@ -15,7 +16,7 @@ async function getDashboardData() {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { updatedAt: "desc" },
     }),
     prisma.role.findMany({
       include: {
@@ -71,6 +72,8 @@ export default async function DashboardPage() {
       </div>
 
       <QuickStats {...stats} />
+
+      <AttentionItems candidates={candidates} />
 
       <div>
         <h2 className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-3">Pipeline by Role</h2>

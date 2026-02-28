@@ -1,90 +1,132 @@
-export type AppUserRole = "TA_LEADER" | "HIRING_MANAGER" | "PLANT_OPS" | "RECRUITER" | "EXECUTIVE";
+// RBAC roles aligned with Prisma UserRole enum and PRD Section 7.1
+export type AppUserRole = "RECRUITER_COORDINATOR" | "RECRUITING_MANAGER" | "HIRING_MANAGER" | "TA_LEADER" | "ADMIN";
 
-interface FieldAccess {
+export interface FieldAccess {
+  // Universal (all roles)
+  candidateStatus: boolean;
+  contactInfo: boolean;
   compositeScores: boolean;
-  subtestDetail: boolean;
-  aiTranscripts: boolean;
-  redFlags: boolean;
-  intelligenceReport: boolean;
-  predictions: boolean;
   interviewGuide: boolean;
   developmentPlan: boolean;
+  predictions: boolean;
+  // Recruiting Manager+
+  redFlags: boolean;
+  intelligenceReport: boolean;
+  // Hiring Manager+
+  subtestDetail: boolean;
+  questionLevel: boolean;
+  aiTranscripts: boolean;
+  peerComparison: boolean;
+  // TA Leader / Admin only
+  rawIrt: boolean;
+  validityMetrics: boolean;
+  auditTrail: boolean;
+  // Operational permissions
   notes: boolean;
   pdfExport: boolean;
   bulkActions: boolean;
-  candidateStatus: boolean;
 }
 
 const ACCESS_MAP: Record<AppUserRole, FieldAccess> = {
-  TA_LEADER: {
+  RECRUITER_COORDINATOR: {
+    candidateStatus: true,
+    contactInfo: true,
     compositeScores: true,
-    subtestDetail: true,
-    aiTranscripts: true,
-    redFlags: true,
-    intelligenceReport: true,
-    predictions: true,
     interviewGuide: true,
     developmentPlan: true,
+    predictions: true,
+    redFlags: false,
+    intelligenceReport: false,
+    subtestDetail: false,
+    questionLevel: false,
+    aiTranscripts: false,
+    peerComparison: false,
+    rawIrt: false,
+    validityMetrics: false,
+    auditTrail: false,
+    notes: true,
+    pdfExport: false,
+    bulkActions: true,
+  },
+  RECRUITING_MANAGER: {
+    candidateStatus: true,
+    contactInfo: true,
+    compositeScores: true,
+    interviewGuide: true,
+    developmentPlan: true,
+    predictions: true,
+    redFlags: true,
+    intelligenceReport: true,
+    subtestDetail: false,
+    questionLevel: false,
+    aiTranscripts: false,
+    peerComparison: false,
+    rawIrt: false,
+    validityMetrics: false,
+    auditTrail: false,
     notes: true,
     pdfExport: true,
     bulkActions: true,
-    candidateStatus: true,
   },
   HIRING_MANAGER: {
+    candidateStatus: true,
+    contactInfo: true,
     compositeScores: true,
-    subtestDetail: true,
-    aiTranscripts: false,
-    redFlags: true,
-    intelligenceReport: true,
-    predictions: true,
     interviewGuide: true,
     developmentPlan: true,
+    predictions: true,
+    redFlags: true,
+    intelligenceReport: true,
+    subtestDetail: true,
+    questionLevel: true,
+    aiTranscripts: true,
+    peerComparison: true,
+    rawIrt: false,
+    validityMetrics: false,
+    auditTrail: false,
     notes: true,
     pdfExport: true,
     bulkActions: false,
-    candidateStatus: false,
   },
-  PLANT_OPS: {
-    compositeScores: true,
-    subtestDetail: false,
-    aiTranscripts: false,
-    redFlags: true,
-    intelligenceReport: false,
-    predictions: true,
-    interviewGuide: false,
-    developmentPlan: false,
-    notes: false,
-    pdfExport: false,
-    bulkActions: false,
-    candidateStatus: false,
-  },
-  RECRUITER: {
-    compositeScores: true,
-    subtestDetail: false,
-    aiTranscripts: false,
-    redFlags: false,
-    intelligenceReport: false,
-    predictions: false,
-    interviewGuide: false,
-    developmentPlan: false,
-    notes: true,
-    pdfExport: false,
-    bulkActions: true,
+  TA_LEADER: {
     candidateStatus: true,
-  },
-  EXECUTIVE: {
+    contactInfo: true,
     compositeScores: true,
-    subtestDetail: false,
-    aiTranscripts: false,
-    redFlags: false,
-    intelligenceReport: false,
-    predictions: false,
-    interviewGuide: false,
-    developmentPlan: false,
-    notes: false,
-    pdfExport: false,
-    bulkActions: false,
-    candidateStatus: false,
+    interviewGuide: true,
+    developmentPlan: true,
+    predictions: true,
+    redFlags: true,
+    intelligenceReport: true,
+    subtestDetail: true,
+    questionLevel: true,
+    aiTranscripts: true,
+    peerComparison: true,
+    rawIrt: true,
+    validityMetrics: true,
+    auditTrail: true,
+    notes: true,
+    pdfExport: true,
+    bulkActions: true,
+  },
+  ADMIN: {
+    candidateStatus: true,
+    contactInfo: true,
+    compositeScores: true,
+    interviewGuide: true,
+    developmentPlan: true,
+    predictions: true,
+    redFlags: true,
+    intelligenceReport: true,
+    subtestDetail: true,
+    questionLevel: true,
+    aiTranscripts: true,
+    peerComparison: true,
+    rawIrt: true,
+    validityMetrics: true,
+    auditTrail: true,
+    notes: true,
+    pdfExport: true,
+    bulkActions: true,
   },
 };
 

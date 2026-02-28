@@ -5,7 +5,7 @@ interface InitialsBadgeProps {
 }
 
 const COLORS = [
-  "bg-naib-blue", "bg-emerald-600", "bg-amber-600", "bg-purple-600",
+  "bg-aci-blue", "bg-emerald-600", "bg-amber-600", "bg-purple-600",
   "bg-rose-600", "bg-cyan-600", "bg-indigo-600", "bg-orange-600",
 ];
 

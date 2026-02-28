@@ -22,14 +22,15 @@ model Organization {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  role      UserRole
-  orgId     String
-  org       Organization @relation(fields: [orgId], references: [id])
-  notes     Note[]
-  createdAt DateTime @default(now())
+  id          String                @id @default(cuid())
+  email       String                @unique
+  name        String
+  role        UserRole
+  orgId       String
+  org         Organization          @relation(fields: [orgId], references: [id])
+  notes       Note[]
+  invitations AssessmentInvitation[]
+  createdAt   DateTime              @default(now())
 }
 
 enum UserRole {
@@ -45,16 +46,17 @@ enum UserRole {
 // ──────────────────────────────────────────────
 
 model Role {
-  id               String            @id @default(cuid())
+  id               String                @id @default(cuid())
   name             String
-  slug             String            @unique
+  slug             String                @unique
   description      String?
   orgId            String
-  org              Organization      @relation(fields: [orgId], references: [id])
+  org              Organization          @relation(fields: [orgId], references: [id])
   cutlines         Cutline[]
   compositeWeights CompositeWeight[]
   candidates       Candidate[]
-  createdAt        DateTime          @default(now())
+  invitations      AssessmentInvitation[]
+  createdAt        DateTime              @default(now())
 }
 
 model Cutline {
@@ -89,20 +91,21 @@ model CompositeWeight {
 // ──────────────────────────────────────────────
 
 model Candidate {
-  id            String          @id @default(cuid())
+  id            String                @id @default(cuid())
   firstName     String
   lastName      String
   email         String
   phone         String?
   orgId         String
-  org           Organization    @relation(fields: [orgId], references: [id])
+  org           Organization          @relation(fields: [orgId], references: [id])
   primaryRoleId String
-  primaryRole   Role            @relation(fields: [primaryRoleId], references: [id])
-  status        CandidateStatus @default(INCOMPLETE)
+  primaryRole   Role                  @relation(fields: [primaryRoleId], references: [id])
+  status        CandidateStatus       @default(INCOMPLETE)
   assessment    Assessment?
+  invitations   AssessmentInvitation[]
   notes         Note[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
 }
 
 enum CandidateStatus {
@@ -294,4 +297,33 @@ model ActivityLog {
   actorId    String?
   metadata   Json?
   createdAt  DateTime @default(now())
+}
+
+// ──────────────────────────────────────────────
+// ASSESSMENT INVITATIONS
+// ──────────────────────────────────────────────
+
+model AssessmentInvitation {
+  id          String           @id @default(cuid())
+  candidateId String
+  candidate   Candidate        @relation(fields: [candidateId], references: [id])
+  roleId      String
+  role        Role             @relation(fields: [roleId], references: [id])
+  invitedBy   String
+  inviter     User             @relation(fields: [invitedBy], references: [id])
+  invitedAt   DateTime         @default(now())
+  expiresAt   DateTime
+  status      InvitationStatus @default(PENDING)
+  linkToken   String           @unique @default(cuid())
+  createdAt   DateTime         @default(now())
+
+  @@index([linkToken])
+  @@index([candidateId])
+}
+
+enum InvitationStatus {
+  PENDING
+  STARTED
+  COMPLETED
+  EXPIRED
 }

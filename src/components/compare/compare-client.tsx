@@ -195,7 +195,7 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
                     <td key={i} className="py-2.5 px-4 text-center">
                       <span
                         className={`inline-flex items-center justify-center w-10 h-7 text-xs font-semibold font-mono ${
-                          score === maxScore && candidates.length > 1 ? "ring-2 ring-naib-gold bg-naib-gold/10" : ""
+                          score === maxScore && candidates.length > 1 ? "ring-2 ring-aci-gold bg-aci-gold/10" : ""
                         }`}
                         style={{ color: CANDIDATE_COLORS[i] }}
                       >

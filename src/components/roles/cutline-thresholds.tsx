@@ -55,12 +55,12 @@ export function CutlineThresholds({ cutline }: CutlineThresholdsProps) {
               <div className="relative h-6 bg-muted overflow-hidden">
                 {/* Fail zone */}
                 <div
-                  className="absolute top-0 bottom-0 left-0 bg-naib-red/8"
+                  className="absolute top-0 bottom-0 left-0 bg-aci-red/8"
                   style={{ width: `${value}%` }}
                 />
                 {/* Pass zone */}
                 <div
-                  className="absolute top-0 bottom-0 right-0 bg-naib-green/8"
+                  className="absolute top-0 bottom-0 right-0 bg-aci-green/8"
                   style={{ left: `${value}%` }}
                 />
                 {/* Cutline marker */}
