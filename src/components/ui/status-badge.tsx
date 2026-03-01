@@ -30,6 +30,12 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; border: string; 
     border: "border-border",
     dot: "bg-muted-foreground",
   },
+  INVITED: {
+    bg: "bg-aci-blue/10 dark:bg-aci-blue/15",
+    text: "text-aci-blue",
+    border: "border-aci-blue/20",
+    dot: "bg-aci-blue",
+  },
 };
 
 export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {

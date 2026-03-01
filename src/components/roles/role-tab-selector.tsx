@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Grid3X3 } from "lucide-react";
+import { useBasePath } from "@/components/base-path-provider";
 
 interface RoleTabSelectorProps {
   roles: { slug: string; name: string }[];
@@ -9,6 +10,7 @@ interface RoleTabSelectorProps {
 }
 
 export function RoleTabSelector({ roles, currentSlug }: RoleTabSelectorProps) {
+  const basePath = useBasePath();
   return (
     <div className="bg-card border border-border">
       <div className="flex items-center justify-between">
@@ -18,7 +20,7 @@ export function RoleTabSelector({ roles, currentSlug }: RoleTabSelectorProps) {
             return (
               <Link
                 key={role.slug}
-                href={`/roles/${role.slug}`}
+                href={`${basePath}/roles/${role.slug}`}
                 className={`px-4 py-3 text-[11px] font-medium uppercase tracking-wider transition-colors border-b-2 ${
                   isActive
                     ? "text-aci-gold border-aci-gold bg-aci-gold/5"
@@ -31,7 +33,7 @@ export function RoleTabSelector({ roles, currentSlug }: RoleTabSelectorProps) {
           })}
         </div>
         <Link
-          href="/roles"
+          href={`${basePath}/roles`}
           className="flex items-center gap-1.5 px-4 py-3 text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
         >
           <Grid3X3 className="w-3.5 h-3.5" />

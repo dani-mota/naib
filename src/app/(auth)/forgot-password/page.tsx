@@ -5,12 +5,33 @@ import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const form = e.target as HTMLFormElement;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+
+    const supabase = createSupabaseBrowserClient();
+    const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/login`,
+    });
+
+    setLoading(false);
+
+    if (authError) {
+      setError(authError.message);
+      return;
+    }
+
     setSent(true);
   };
 
@@ -38,12 +59,17 @@ export default function ForgotPasswordPage() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 bg-aci-red/10 border border-aci-red/20 text-xs text-aci-red">
+              {error}
+            </div>
+          )}
           <div>
             <label htmlFor="email" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">Email</label>
             <Input id="email" type="email" placeholder="you@company.com" />
           </div>
-          <Button type="submit" variant="gold" className="w-full h-10 text-sm">
-            Send Reset Link
+          <Button type="submit" variant="gold" className="w-full h-10 text-sm" disabled={loading}>
+            {loading ? "Sending..." : "Send Reset Link"}
           </Button>
         </form>
       )}

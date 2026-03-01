@@ -164,7 +164,7 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
   );
 
   return (
-    <div className="p-6">
+    <div className="p-6" data-tutorial="profile-header">
       <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_300px] gap-4">
         {/* Left Sidebar */}
         <div className="space-y-3">
@@ -175,7 +175,7 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
             roleName={selectedRole?.name}
           />
           {/* Quick Actions */}
-          <div className="bg-card border border-border p-4">
+          <div className="bg-card border border-border p-4" data-tutorial="profile-pdf-export">
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-2">Actions</p>
             <button
               onClick={() => {
@@ -314,14 +314,16 @@ export function ProfileClient({ candidate, allRoles, cutlines }: ProfileClientPr
             </div>
           </div>
 
-          <SpiderChart
-            subtestResults={subtestResults}
-            roleWeights={selectedRole?.compositeWeights || []}
-            cutline={cutline}
-            roleSlug={selectedRoleSlug}
-            weightDiffs={weightDiffs}
-            showAnimation={showAnimation}
-          />
+          <div data-tutorial="profile-spider-chart">
+            <SpiderChart
+              subtestResults={subtestResults}
+              roleWeights={selectedRole?.compositeWeights || []}
+              cutline={cutline}
+              roleSlug={selectedRoleSlug}
+              weightDiffs={weightDiffs}
+              showAnimation={showAnimation}
+            />
+          </div>
 
           <IntelligenceReport
             subtestResults={subtestResults}

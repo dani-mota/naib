@@ -14,6 +14,7 @@ datasource db {
 model Organization {
   id         String      @id @default(cuid())
   name       String
+  isDemo     Boolean     @default(false)
   createdAt  DateTime    @default(now())
   users      User[]
   candidates Candidate[]
@@ -23,6 +24,7 @@ model Organization {
 
 model User {
   id          String                @id @default(cuid())
+  supabaseId  String?               @unique
   email       String                @unique
   name        String
   role        UserRole
@@ -109,6 +111,7 @@ model Candidate {
 }
 
 enum CandidateStatus {
+  INVITED
   INCOMPLETE
   SCORING
   RECOMMENDED
@@ -117,9 +120,9 @@ enum CandidateStatus {
 }
 
 model Assessment {
-  id              String           @id @default(cuid())
-  candidateId     String           @unique
-  candidate       Candidate        @relation(fields: [candidateId], references: [id])
+  id              String              @id @default(cuid())
+  candidateId     String              @unique
+  candidate       Candidate           @relation(fields: [candidateId], references: [id])
   startedAt       DateTime
   completedAt     DateTime?
   durationMinutes Int?
@@ -128,7 +131,9 @@ model Assessment {
   predictions     Prediction?
   redFlags        RedFlag[]
   aiInteractions  AIInteraction[]
-  createdAt       DateTime         @default(now())
+  itemResponses   ItemResponse[]
+  survey          PostAssessmentSurvey?
+  createdAt       DateTime            @default(now())
 }
 
 // ──────────────────────────────────────────────
@@ -304,18 +309,21 @@ model ActivityLog {
 // ──────────────────────────────────────────────
 
 model AssessmentInvitation {
-  id          String           @id @default(cuid())
-  candidateId String
-  candidate   Candidate        @relation(fields: [candidateId], references: [id])
-  roleId      String
-  role        Role             @relation(fields: [roleId], references: [id])
-  invitedBy   String
-  inviter     User             @relation(fields: [invitedBy], references: [id])
-  invitedAt   DateTime         @default(now())
-  expiresAt   DateTime
-  status      InvitationStatus @default(PENDING)
-  linkToken   String           @unique @default(cuid())
-  createdAt   DateTime         @default(now())
+  id            String           @id @default(cuid())
+  candidateId   String
+  candidate     Candidate        @relation(fields: [candidateId], references: [id])
+  roleId        String
+  role          Role             @relation(fields: [roleId], references: [id])
+  invitedBy     String
+  inviter       User             @relation(fields: [invitedBy], references: [id])
+  invitedAt     DateTime         @default(now())
+  expiresAt     DateTime
+  status        InvitationStatus @default(PENDING)
+  linkToken     String           @unique @default(cuid())
+  emailSentAt   DateTime?
+  linkOpenedAt  DateTime?
+  reminderCount Int              @default(0)
+  createdAt     DateTime         @default(now())
 
   @@index([linkToken])
   @@index([candidateId])
@@ -326,4 +334,42 @@ enum InvitationStatus {
   STARTED
   COMPLETED
   EXPIRED
+}
+
+// ──────────────────────────────────────────────
+// ITEM RESPONSES & SURVEY
+// ──────────────────────────────────────────────
+
+model ItemResponse {
+  id             String     @id @default(cuid())
+  assessmentId   String
+  assessment     Assessment @relation(fields: [assessmentId], references: [id])
+  itemId         String
+  itemType       ItemType
+  response       String
+  responseTimeMs Int?
+  confidence     Float?
+  rawScore       Float?
+  createdAt      DateTime   @default(now())
+
+  @@unique([assessmentId, itemId])
+}
+
+enum ItemType {
+  MULTIPLE_CHOICE
+  LIKERT
+  OPEN_RESPONSE
+  AI_PROBE
+  TIMED_SEQUENCE
+}
+
+model PostAssessmentSurvey {
+  id           String     @id @default(cuid())
+  assessmentId String     @unique
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  difficulty   Int
+  fairness     Int
+  faceValidity Int
+  openFeedback String?
+  createdAt    DateTime   @default(now())
 }

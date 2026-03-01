@@ -32,6 +32,7 @@ export function getStatusLabel(status: string): string {
     case "RECOMMENDED": return "Strong Fit";
     case "REVIEW_REQUIRED": return "Conditional Fit";
     case "DO_NOT_ADVANCE": return "Not a Direct Fit";
+    case "INVITED": return "Invited";
     case "INCOMPLETE": return "In Progress";
     case "SCORING": return "Scoring";
     default: return status;
@@ -43,6 +44,7 @@ export function getStatusVariant(status: string): string {
     case "RECOMMENDED": return "recommended";
     case "REVIEW_REQUIRED": return "review";
     case "DO_NOT_ADVANCE": return "doNotAdvance";
+    case "INVITED": return "invited";
     case "INCOMPLETE": return "incomplete";
     default: return "secondary";
   }
@@ -53,6 +55,7 @@ export function getStatusColor(status: string): string {
     case "RECOMMENDED": return "#059669";
     case "REVIEW_REQUIRED": return "#D97706";
     case "DO_NOT_ADVANCE": return "#9B1C1C";
+    case "INVITED": return "#3B82F6";
     case "INCOMPLETE": return "#64748B";
     default: return "#64748B";
   }

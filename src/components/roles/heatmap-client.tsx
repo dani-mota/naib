@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ChevronUp, ChevronDown, Download, Image } from "lucide-react";
+import { useBasePath } from "@/components/base-path-provider";
 import { CONSTRUCTS, LAYER_INFO, type LayerType } from "@/lib/constructs";
 import { getScoreTier } from "@/lib/format";
 import { downloadCSV, captureElementAsPNG } from "@/lib/export";
@@ -36,6 +37,7 @@ const CONSTRUCT_COPY: Record<string, string> = {
 
 export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapClientProps) {
   const router = useRouter();
+  const basePath = useBasePath();
   const tableRef = useRef<HTMLDivElement>(null);
   const [selectedRoleSlug, setSelectedRoleSlug] = useState(roles[0]?.slug || "");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -132,7 +134,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
 
   const handleCompare = () => {
     if (selectedIds.size >= 2) {
-      router.push(`/compare?ids=${Array.from(selectedIds).join(",")}`);
+      router.push(`${basePath}/compare?ids=${Array.from(selectedIds).join(",")}`);
     }
   };
 
@@ -221,7 +223,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
             ))}
           </select>
           <Link
-            href={`/roles/${selectedRoleSlug}`}
+            href={`${basePath}/roles/${selectedRoleSlug}`}
             className="flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-wider text-aci-gold border border-aci-gold/30 hover:bg-aci-gold/10 transition-colors"
           >
             Role Profile
@@ -231,7 +233,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
       </div>
 
       {/* Heatmap */}
-      <div ref={tableRef} className="bg-card border border-border overflow-x-auto relative">
+      <div ref={tableRef} className="bg-card border border-border overflow-x-auto relative" data-tutorial="heatmap-table">
         <table className="w-full text-[9px] border-collapse">
           <thead>
             <tr className="border-b border-border">
@@ -307,7 +309,7 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                     </td>
                     <td className="sticky left-7 bg-card py-0 px-1.5">
                       <Link
-                        href={`/candidates/${row.id}`}
+                        href={`${basePath}/candidates/${row.id}`}
                         className="text-[10px] font-medium text-foreground hover:text-aci-gold transition-colors"
                       >
                         {row.name}
@@ -324,13 +326,14 @@ export function HeatmapClient({ candidates, roles, weights, cutlines }: HeatmapC
                         {row.composite}
                       </span>
                     </td>
-                    {CONSTRUCT_ORDER.map((key) => {
+                    {CONSTRUCT_ORDER.map((key, colIdx) => {
                       const val = row.scores[key] ?? 0;
                       const isHighWeight = highWeightConstructs.has(key);
                       return (
                         <td
                           key={key}
                           className={`py-0 px-0 text-center ${isHighWeight ? "border-l-2 border-l-aci-gold/30" : ""}`}
+                          {...(i === 0 && colIdx === 0 ? { "data-tutorial": "heatmap-cell" } : {})}
                           onMouseEnter={(e) => {
                             setHoveredCell({ key, val, x: e.clientX, y: e.clientY });
                           }}

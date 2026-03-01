@@ -6,19 +6,34 @@ import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 500);
+
+    const supabase = createSupabaseBrowserClient();
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+      return;
+    }
+
+    router.push("/dashboard");
+    router.refresh();
   };
 
   return (
@@ -35,6 +50,11 @@ export default function LoginPage() {
       }
     >
       <form onSubmit={handleLogin} className="space-y-4">
+        {error && (
+          <div className="p-3 bg-aci-red/10 border border-aci-red/20 text-xs text-aci-red">
+            {error}
+          </div>
+        )}
         <div>
           <label htmlFor="email" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">
             Email
@@ -74,7 +94,7 @@ export default function LoginPage() {
       </form>
 
       <div className="mt-6 pt-6 border-t border-border">
-        <Link href="/demo">
+        <Link href="/tutorial/dashboard">
           <Button variant="outline" className="w-full">
             Try Interactive Demo
           </Button>

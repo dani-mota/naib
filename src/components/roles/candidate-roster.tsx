@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { InitialsBadge } from "@/components/ui/initials-badge";
+import { useBasePath } from "@/components/base-path-provider";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { CONSTRUCTS, LAYER_INFO, type LayerType } from "@/lib/constructs";
 
@@ -44,6 +45,7 @@ const VARIANT_CONFIG = {
 };
 
 export function CandidateRoster({ title, subtitle, candidates, variant }: CandidateRosterProps) {
+  const basePath = useBasePath();
   const config = VARIANT_CONFIG[variant];
 
   return (
@@ -78,7 +80,7 @@ export function CandidateRoster({ title, subtitle, candidates, variant }: Candid
               <InitialsBadge firstName={c.firstName} lastName={c.lastName} size="sm" />
 
               <div className="flex-1 min-w-0">
-                <Link href={`/candidates/${c.id}`} className="text-xs font-medium text-foreground hover:text-aci-gold transition-colors">
+                <Link href={`${basePath}/candidates/${c.id}`} className="text-xs font-medium text-foreground hover:text-aci-gold transition-colors">
                   {c.firstName} {c.lastName}
                 </Link>
                 {/* Failure reasons for review/doNotAdvance */}

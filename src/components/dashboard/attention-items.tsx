@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Clock, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useBasePath } from "@/components/base-path-provider";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { InitialsBadge } from "@/components/ui/initials-badge";
 import { formatRelativeDate } from "@/lib/format";
@@ -65,7 +66,7 @@ export function AttentionItems({ candidates }: AttentionItemsProps) {
   }
 
   return (
-    <div>
+    <div data-tutorial="attention-items">
       <h2 className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-3">
         Needs Attention ({totalItems})
       </h2>
@@ -118,9 +119,10 @@ function AttentionCard({
   detail: string;
   borderColor: string;
 }) {
+  const basePath = useBasePath();
   return (
     <Link
-      href={`/candidates/${candidate.id}`}
+      href={`${basePath}/candidates/${candidate.id}`}
       className={`min-w-[240px] max-w-[280px] bg-card border border-border ${borderColor} border-l-2 rounded-md p-3 hover:bg-accent/50 transition-colors flex-shrink-0`}
     >
       <div className="flex items-center gap-2 mb-2">

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Users, TrendingUp } from "lucide-react";
+import { useBasePath } from "@/components/base-path-provider";
 
 interface RolePipeline {
   slug: string;
@@ -17,6 +18,7 @@ interface PipelineCardsProps {
 }
 
 export function PipelineCards({ roles }: PipelineCardsProps) {
+  const basePath = useBasePath();
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
       {roles.map((role) => {
@@ -25,7 +27,7 @@ export function PipelineCards({ roles }: PipelineCardsProps) {
         return (
           <Link
             key={role.slug}
-            href={`/roles/${role.slug}`}
+            href={`${basePath}/roles/${role.slug}`}
             className="bg-card border border-border p-4 hover:border-aci-gold/30 transition-all group"
           >
             <div className="flex items-center justify-between mb-3">

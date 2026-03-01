@@ -6,15 +6,53 @@ import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    setTimeout(() => router.push("/dashboard"), 500);
+
+    const form = e.target as HTMLFormElement;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+    const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement).value;
+    const firstName = (form.elements.namedItem("firstName") as HTMLInputElement).value;
+    const lastName = (form.elements.namedItem("lastName") as HTMLInputElement).value;
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    const supabase = createSupabaseBrowserClient();
+    const { error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`,
+        },
+      },
+    });
+
+    if (authError) {
+      setError(authError.message);
+      setLoading(false);
+      return;
+    }
+
+    setSuccess(true);
+    setLoading(false);
   };
 
   return (
@@ -30,7 +68,25 @@ export default function SignupPage() {
         </span>
       }
     >
+      {success ? (
+        <div className="text-center py-4">
+          <div className="w-14 h-14 bg-aci-green/10 border border-aci-green/20 flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-aci-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-foreground mb-2">Request submitted</p>
+          <p className="text-xs text-muted-foreground">
+            Check your email to confirm your account. An administrator will approve your access shortly.
+          </p>
+        </div>
+      ) : (
       <form onSubmit={handleSignup} className="space-y-4">
+        {error && (
+          <div className="p-3 bg-aci-red/10 border border-aci-red/20 text-xs text-aci-red">
+            {error}
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label htmlFor="firstName" className="block text-xs font-medium text-foreground mb-1.5 uppercase tracking-wider">First name</label>
@@ -75,6 +131,7 @@ export default function SignupPage() {
           {loading ? "Submitting..." : "Request Access"}
         </Button>
       </form>
+      )}
     </AuthCard>
   );
 }

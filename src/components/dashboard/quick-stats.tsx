@@ -42,7 +42,7 @@ export function QuickStats({ totalAssessed, strongFitRate, avgDuration, weeklyVo
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-tutorial="dashboard-quick-stats">
       {stats.map((stat) => (
         <div key={stat.label} className="bg-card border border-border p-4">
           <div className="flex items-center gap-3">

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, ChevronUp, ChevronDown, AlertTriangle, Download } from "lucide-react";
+import { useBasePath } from "@/components/base-path-provider";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ScoreBar } from "@/components/ui/score-bar";
@@ -42,6 +43,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function CandidateTable({ candidates }: CandidateTableProps) {
   const router = useRouter();
+  const basePath = useBasePath();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
@@ -179,7 +181,7 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
   };
 
   return (
-    <div className="bg-card border border-border">
+    <div className="bg-card border border-border" data-tutorial="candidate-table">
       {/* Toolbar */}
       <div className="p-3 border-b border-border flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
@@ -286,7 +288,7 @@ export function CandidateTable({ candidates }: CandidateTableProps) {
                     />
                   </td>
                   <td className="py-2.5 px-4">
-                    <Link href={`/candidates/${candidate.id}`} className="flex items-center gap-3 group">
+                    <Link href={`${basePath}/candidates/${candidate.id}`} className="flex items-center gap-3 group">
                       <InitialsBadge firstName={candidate.firstName} lastName={candidate.lastName} size="sm" />
                       <div>
                         <p className="text-xs font-medium text-foreground group-hover:text-aci-gold transition-colors">

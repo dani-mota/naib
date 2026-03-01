@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Grid3X3, GitCompareArrows, Sparkles, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Grid3X3, GitCompareArrows, Sparkles, ArrowLeft, Sun, Moon } from "lucide-react";
 import { UserMenu } from "./user-menu";
 import { NotificationBell } from "./notification-bell";
 import { useTheme } from "@/components/theme-provider";
@@ -19,20 +19,22 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   { id: "n5", type: "NEW_CANDIDATE", title: "New Candidate", message: "Lisa Wong was added to the CMM Programmer pipeline.", timestamp: daysAgo(2), read: true },
 ];
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/roles", label: "Roles", icon: Grid3X3 },
-  { href: "/compare", label: "Compare", icon: GitCompareArrows },
+const BASE_NAV_ITEMS = [
+  { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/roles", label: "Roles", icon: Grid3X3 },
+  { path: "/compare", label: "Compare", icon: GitCompareArrows },
 ];
 
-export function TopNav() {
+export function TopNav({ mode = "live" }: { mode?: "live" | "tutorial" }) {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
+  const isTutorial = mode === "tutorial";
+  const prefix = isTutorial ? "/tutorial" : "";
 
   return (
     <header className="sticky top-0 z-50 h-12 bg-card border-b border-border">
       <div className="h-full max-w-[1600px] mx-auto px-4 flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2.5">
+        <Link href={`${prefix}/dashboard`} className="flex items-center gap-2.5">
           <span className="text-lg font-bold tracking-tight text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
             ACI
           </span>
@@ -43,7 +45,8 @@ export function TopNav() {
         </Link>
 
         <nav className="flex items-center gap-0.5">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          {BASE_NAV_ITEMS.map(({ path, label, icon: Icon }) => {
+            const href = `${prefix}${path}`;
             const isActive = pathname.startsWith(href);
             return (
               <Link
@@ -61,17 +64,27 @@ export function TopNav() {
             );
           })}
           <div className="w-px h-5 bg-border mx-1.5" />
-          <Link
-            href="/demo"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-aci-gold hover:text-aci-gold/80 transition-colors"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Demo</span>
-          </Link>
+          {isTutorial ? (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-aci-gold hover:text-aci-gold/80 transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Exit Tutorial</span>
+            </Link>
+          ) : (
+            <Link
+              href="/tutorial/dashboard"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-aci-gold hover:text-aci-gold/80 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Tutorial Demo</span>
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
-          <NotificationBell notifications={MOCK_NOTIFICATIONS} />
+          {!isTutorial && <NotificationBell notifications={MOCK_NOTIFICATIONS} />}
           <button
             onClick={toggleTheme}
             className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
@@ -79,7 +92,7 @@ export function TopNav() {
           >
             {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <UserMenu />
+          {!isTutorial && <UserMenu />}
         </div>
       </div>
     </header>

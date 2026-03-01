@@ -1,35 +1,14 @@
-import prisma from "@/lib/prisma";
+import { getCompareData } from "@/lib/data";
+import { getSession } from "@/lib/auth";
 import { CompareClient } from "@/components/compare/compare-client";
 
 interface PageProps {
   searchParams: Promise<{ ids?: string }>;
 }
 
-async function getCompareData(ids: string[]) {
-  const candidates = await prisma.candidate.findMany({
-    where: { id: { in: ids } },
-    include: {
-      primaryRole: true,
-      assessment: {
-        include: {
-          subtestResults: true,
-          compositeScores: true,
-          predictions: true,
-          redFlags: true,
-        },
-      },
-    },
-  });
-
-  const roles = await prisma.role.findMany();
-
-  return {
-    candidates: JSON.parse(JSON.stringify(candidates)),
-    roles: JSON.parse(JSON.stringify(roles)),
-  };
-}
-
 export default async function ComparePage({ searchParams }: PageProps) {
+  const session = await getSession();
+  const orgId = session?.user.orgId ?? undefined;
   const params = await searchParams;
   const ids = params.ids?.split(",").filter(Boolean) || [];
 
@@ -48,6 +27,6 @@ export default async function ComparePage({ searchParams }: PageProps) {
     );
   }
 
-  const data = await getCompareData(ids);
+  const data = await getCompareData(ids, orgId);
   return <CompareClient {...data} />;
 }

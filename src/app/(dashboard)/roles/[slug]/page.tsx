@@ -1,4 +1,5 @@
-import prisma from "@/lib/prisma";
+import { getRoleDetailData } from "@/lib/data";
+import { getSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { RoleDetailClient } from "@/components/roles/role-detail-client";
 
@@ -6,43 +7,11 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-async function getRoleDetailData(slug: string) {
-  const role = await prisma.role.findFirst({
-    where: { slug },
-    include: {
-      compositeWeights: true,
-      cutlines: true,
-    },
-  });
-
-  if (!role) return null;
-
-  const [allRoles, candidates] = await Promise.all([
-    prisma.role.findMany({ orderBy: { name: "asc" } }),
-    prisma.candidate.findMany({
-      include: {
-        primaryRole: true,
-        assessment: {
-          include: {
-            subtestResults: true,
-            compositeScores: true,
-            redFlags: true,
-          },
-        },
-      },
-    }),
-  ]);
-
-  return {
-    role: JSON.parse(JSON.stringify(role)),
-    allRoles: JSON.parse(JSON.stringify(allRoles)),
-    candidates: JSON.parse(JSON.stringify(candidates)),
-  };
-}
-
 export default async function RoleDetailPage({ params }: PageProps) {
+  const session = await getSession();
+  const orgId = session?.user.orgId ?? undefined;
   const { slug } = await params;
-  const data = await getRoleDetailData(slug);
+  const data = await getRoleDetailData(slug, orgId);
 
   if (!data) notFound();
 

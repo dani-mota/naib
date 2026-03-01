@@ -61,7 +61,7 @@ export function CompareClient({ candidates, roles }: CompareClientProps) {
   });
 
   return (
-    <div ref={compareRef} className="p-6 space-y-6">
+    <div ref={compareRef} className="p-6 space-y-6" data-tutorial="compare-chart">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-dm-sans)" }}>
