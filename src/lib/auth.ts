@@ -20,6 +20,8 @@ export interface AppSession {
  */
 export async function getSession(): Promise<AppSession | null> {
   const supabase = await createSupabaseServerClient();
+  if (!supabase) return null;
+
   const {
     data: { user: supabaseUser },
   } = await supabase.auth.getUser();
