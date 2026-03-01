@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { requireAuth } from "@/lib/auth";
 import { ExportPanel } from "@/components/dashboard/export-panel";
 import { redirect } from "next/navigation";

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getDashboardData, getDemoOrgId } from "@/lib/data";
 import { PipelineCards } from "@/components/dashboard/pipeline-cards";
 import { QuickStats } from "@/components/dashboard/quick-stats";

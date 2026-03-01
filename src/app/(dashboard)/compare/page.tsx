@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getCompareData } from "@/lib/data";
 import { getSession } from "@/lib/auth";
 import { CompareClient } from "@/components/compare/compare-client";

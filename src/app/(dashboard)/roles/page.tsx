@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getHeatmapData } from "@/lib/data";
 import { getSession } from "@/lib/auth";
 import { HeatmapClient } from "@/components/roles/heatmap-client";
