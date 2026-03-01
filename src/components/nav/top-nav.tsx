@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Grid3X3, GitCompareArrows, Sparkles, ArrowLeft, Sun, Moon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { LayoutDashboard, Grid3X3, GitCompareArrows, Sparkles, ArrowLeft, Sun, Moon, Shield } from "lucide-react";
 import { UserMenu } from "./user-menu";
 import { NotificationBell } from "./notification-bell";
 import { useTheme } from "@/components/theme-provider";
+import { useAuth } from "@/components/auth-provider";
 import type { Notification } from "@/lib/notifications";
 
 function hoursAgo(h: number) { return new Date(Date.now() - h * 3600000); }
@@ -24,6 +26,44 @@ const BASE_NAV_ITEMS = [
   { path: "/roles", label: "Roles", icon: Grid3X3 },
   { path: "/compare", label: "Compare", icon: GitCompareArrows },
 ];
+
+/** Admin nav link — extracted so useAuth() is only called in live mode */
+function AdminNavLink() {
+  const { user } = useAuth();
+  const pathname = usePathname();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    if (user.role !== "ADMIN") return;
+    fetch("/api/access-requests?status=PENDING")
+      .then((r) => r.ok ? r.json() : [])
+      .then((data: unknown[]) => setPendingCount(data.length))
+      .catch(() => {});
+  }, [user.role]);
+
+  if (user.role !== "ADMIN") return null;
+
+  const isActive = pathname.startsWith("/admin");
+
+  return (
+    <Link
+      href="/admin"
+      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
+        isActive
+          ? "text-aci-gold border-b-2 border-aci-gold"
+          : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      <Shield className="w-3.5 h-3.5" />
+      <span className="hidden sm:inline">Admin</span>
+      {pendingCount > 0 && (
+        <span className="ml-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-aci-red text-white rounded-full px-1">
+          {pendingCount}
+        </span>
+      )}
+    </Link>
+  );
+}
 
 export function TopNav({ mode = "live" }: { mode?: "live" | "tutorial" }) {
   const pathname = usePathname();
@@ -63,6 +103,7 @@ export function TopNav({ mode = "live" }: { mode?: "live" | "tutorial" }) {
               </Link>
             );
           })}
+          {!isTutorial && <AdminNavLink />}
           <div className="w-px h-5 bg-border mx-1.5" />
           {isTutorial ? (
             <Link

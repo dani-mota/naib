@@ -23,9 +23,23 @@ export default function SignupPage() {
     const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement).value;
     const firstName = (form.elements.namedItem("firstName") as HTMLInputElement).value;
     const lastName = (form.elements.namedItem("lastName") as HTMLInputElement).value;
+    const company = (form.elements.namedItem("company") as HTMLInputElement).value;
+    const role = (form.elements.namedItem("role") as HTMLSelectElement).value;
+
+    if (!firstName || !lastName || !company || !role || !email || !password) {
+      setError("Please fill in all fields.");
+      setLoading(false);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
       setLoading(false);
       return;
     }
@@ -37,7 +51,7 @@ export default function SignupPage() {
       return;
     }
 
-    const { error: authError } = await supabase.auth.signUp({
+    const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -53,6 +67,24 @@ export default function SignupPage() {
       setError(authError.message);
       setLoading(false);
       return;
+    }
+
+    // Create access request in our database
+    try {
+      await fetch("/api/access-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          firstName,
+          lastName,
+          companyName: company,
+          requestedRole: role,
+          supabaseId: data.user?.id,
+        }),
+      });
+    } catch {
+      // Non-critical — admin can still see the Supabase user
     }
 
     setSuccess(true);

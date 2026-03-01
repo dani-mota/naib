@@ -58,3 +58,35 @@ export async function requireAuth(): Promise<AppSession> {
   }
   return session;
 }
+
+export type AuthStatus = "unauthenticated" | "pending" | "rejected" | "approved";
+
+/**
+ * Check the full auth status of the current user.
+ * Distinguishes between unauthenticated, pending approval, rejected, and approved.
+ */
+export async function getAuthStatus(): Promise<{ status: AuthStatus }> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { status: "unauthenticated" };
+
+  const {
+    data: { user: supabaseUser },
+  } = await supabase.auth.getUser();
+
+  if (!supabaseUser) return { status: "unauthenticated" };
+
+  // Check if they have a Prisma User (means they're approved)
+  const user = await prisma.user.findUnique({
+    where: { supabaseId: supabaseUser.id },
+  });
+  if (user) return { status: "approved" };
+
+  // Check their access request
+  const request = await prisma.accessRequest.findUnique({
+    where: { supabaseId: supabaseUser.id },
+  });
+
+  if (request?.status === "REJECTED") return { status: "rejected" };
+
+  return { status: "pending" };
+}

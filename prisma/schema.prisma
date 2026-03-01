@@ -30,9 +30,10 @@ model User {
   role        UserRole
   orgId       String
   org         Organization          @relation(fields: [orgId], references: [id])
-  notes       Note[]
-  invitations AssessmentInvitation[]
-  createdAt   DateTime              @default(now())
+  notes            Note[]
+  invitations      AssessmentInvitation[]
+  reviewedRequests AccessRequest[]        @relation("ReviewedRequests")
+  createdAt        DateTime              @default(now())
 }
 
 enum UserRole {
@@ -372,4 +373,31 @@ model PostAssessmentSurvey {
   faceValidity Int
   openFeedback String?
   createdAt    DateTime   @default(now())
+}
+
+// ──────────────────────────────────────────────
+// ACCESS REQUESTS
+// ──────────────────────────────────────────────
+
+enum AccessRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model AccessRequest {
+  id              String              @id @default(cuid())
+  email           String              @unique
+  firstName       String
+  lastName        String
+  companyName     String
+  requestedRole   UserRole
+  supabaseId      String              @unique
+  status          AccessRequestStatus @default(PENDING)
+  reviewedBy      String?
+  reviewer        User?               @relation("ReviewedRequests", fields: [reviewedBy], references: [id])
+  reviewedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 }

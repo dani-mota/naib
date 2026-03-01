@@ -48,16 +48,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If authenticated and hitting login/signup, redirect to dashboard
-  if (
-    user &&
-    (request.nextUrl.pathname === "/login" ||
-      request.nextUrl.pathname === "/signup")
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
-  }
+  // Note: we do NOT redirect authenticated users from /login to /dashboard here,
+  // because unapproved users (Supabase auth exists but no Prisma User) would
+  // create a redirect loop. This redirect is handled at the page level instead.
 
   return supabaseResponse;
 }
