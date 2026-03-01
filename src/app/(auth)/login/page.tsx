@@ -18,9 +18,21 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter your email and password.");
+      return;
+    }
+
     setLoading(true);
 
     const supabase = createSupabaseBrowserClient();
+    if (!supabase) {
+      setError("Authentication is not configured. Please contact your administrator.");
+      setLoading(false);
+      return;
+    }
+
     const { error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -65,6 +77,7 @@ export default function LoginPage() {
             placeholder="you@company.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </div>
         <div>
@@ -77,6 +90,7 @@ export default function LoginPage() {
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
         <div className="flex items-center justify-between">

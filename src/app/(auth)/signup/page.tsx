@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -33,6 +31,12 @@ export default function SignupPage() {
     }
 
     const supabase = createSupabaseBrowserClient();
+    if (!supabase) {
+      setError("Authentication is not configured. Please contact your administrator.");
+      setLoading(false);
+      return;
+    }
+
     const { error: authError } = await supabase.auth.signUp({
       email,
       password,

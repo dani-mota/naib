@@ -21,6 +21,12 @@ export default function ForgotPasswordPage() {
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
 
     const supabase = createSupabaseBrowserClient();
+    if (!supabase) {
+      setError("Authentication is not configured. Please contact your administrator.");
+      setLoading(false);
+      return;
+    }
+
     const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/login`,
     });

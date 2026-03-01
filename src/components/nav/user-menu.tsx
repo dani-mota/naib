@@ -60,7 +60,9 @@ export function UserMenu() {
             onClick={async () => {
               setOpen(false);
               const supabase = createSupabaseBrowserClient();
-              await supabase.auth.signOut();
+              if (supabase) {
+                await supabase.auth.signOut();
+              }
               router.push("/login");
               router.refresh();
             }}
